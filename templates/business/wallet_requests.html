@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Wallet Requests</h3>
+
+<table class="table">
+
+<tr>
+<th>Business</th>
+<th>Amount</th>
+<th>UTR</th>
+<th>Action</th>
+</tr>
+
+{% for r in requests %}
+
+<tr>
+
+<td>{{r.business_name}}</td>
+<td>₹{{r.amount}}</td>
+<td>{{r.utr_number}}</td>
+
+<td>
+
+<a href="/admin/approve_wallet/{{r.id}}" class="btn btn-success btn-sm">
+Approve
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

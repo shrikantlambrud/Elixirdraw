@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Business Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+    background: #f4f6f9;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100vh;
+    background: #212529;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+    width: 220px;
+    overflow-y: auto;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.sidebar h4 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 12px 20px;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #343a40;
+    padding-left: 25px;
+}
+
+/* CONTENT */
+.content {
+    margin-left: 220px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+/* TOPBAR */
+.topbar {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* TOPBAR BUSINESS NAME */
+.admin-user {
+    font-weight: 500;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .sidebar {
+        left: -220px;
+        position: fixed;
+        top: 0;
+        height: 100%;
+    }
+    .sidebar.show {
+        left: 0;
+    }
+    .content {
+        margin-left: 0;
+    }
+    .sidebar-toggle {
+        display: inline-block;
+        cursor: pointer;
+    }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar" id="sidebar">
+            <h4>Business</h4>
+            <hr>
+            <a href="/business/dashboard" class="{% if request.path == '/business/dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="/business/add_property" class="{% if request.path == '/business/add_property' %}active{% endif %}">Add Property</a>
+            <a href="/business/add_material" class="{% if request.path == '/business/add_material' %}active{% endif %}">Add Material</a>
+            <a href="/business/wallet" class="{% if request.path == '/business/wallet' %}active{% endif %}">Wallet</a>
+            <a href="/business/profile" class="{% if request.path == '/business/profile' %}active{% endif %}">Profile</a>
+            <a href="/logout" class="text-danger">Logout</a>
+        </div>
+
+        <!-- Content -->
+        <div class="col-md-10 content">
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <div>
+                    <span class="sidebar-toggle d-md-none" onclick="toggleSidebar()">
+                        <i class="bi bi-list fs-3"></i>
+                    </span>
+                    <span class="navbar-brand mb-0 h5 ms-2">Business Dashboard</span>
+                </div>
+                <div class="admin-user">
+                    👤 {{ business.business_name if business else 'Business' }}
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Toggle sidebar on mobile
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h3>✅ Approved Users</h3>
+
+{% if users %}
+
+<div class="table-responsive mt-3">
+<table class="table table-bordered table-hover">
+
+<thead class="table-dark">
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Business</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Role</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for u in users %}
+<tr>
+
+<td>{{ u.id }}</td>
+<td>{{ u.name }}</td>
+<td>{{ u.business_name }}</td>
+<td>{{ u.email }}</td>
+<td>{{ u.phone }}</td>
+<td>{{ u.role }}</td>
+
+<td>
+<span class="badge bg-success">✔ Approved</span>
+</td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+</div>
+
+{% else %}
+
+<p class="text-muted mt-3">No approved users found</p>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

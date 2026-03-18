@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* CARD */
+.register-card{
+background:#fff;
+border-radius:14px;
+box-shadow:0 8px 25px rgba(0,0,0,0.1);
+padding:30px;
+}
+
+/* TITLE */
+.register-title{
+font-weight:700;
+text-align:center;
+margin-bottom:20px;
+}
+
+/* INPUT */
+.form-control{
+border-radius:8px;
+padding:10px;
+}
+
+/* ICON INPUT */
+.input-group-text{
+background:#f1f1f1;
+border-radius:8px 0 0 8px;
+}
+
+/* BUTTON */
+.btn-register{
+border-radius:8px;
+padding:10px;
+font-weight:600;
+}
+
+/* SMALL TEXT */
+small{
+font-size:12px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.register-card{
+padding:20px;
+}
+}
+
+</style>
+
+<div class="container mt-5" style="max-width:600px;">
+
+<div class="register-card">
+
+<h3 class="register-title">🏢 Business Registration</h3>
+
+<form method="POST" enctype="multipart/form-data">
+
+<!-- BUSINESS NAME -->
+<div class="mb-3 input-group">
+<span class="input-group-text">🏢</span>
+<input type="text" name="business_name" placeholder="Business Name"
+class="form-control" required>
+</div>
+
+<!-- EMAIL -->
+<div class="mb-3 input-group">
+<span class="input-group-text">📧</span>
+<input type="email" name="email" placeholder="Email Address"
+class="form-control" required>
+</div>
+
+<!-- PHONE -->
+<div class="mb-3 input-group">
+<span class="input-group-text">📱</span>
+<input type="tel" name="phone" placeholder="Phone Number"
+pattern="[0-9]{10}" maxlength="10"
+class="form-control" required>
+</div>
+<small class="text-muted">Enter 10 digit mobile number</small>
+
+<!-- ADDRESS -->
+<div class="mb-3 mt-2">
+<textarea name="address" placeholder="Business Address"
+class="form-control" required></textarea>
+</div>
+
+<!-- UDYAM -->
+<div class="mb-3 input-group">
+<span class="input-group-text">🆔</span>
+<input type="text" name="udyam_no"
+placeholder="Udyam Registration Number (Optional)"
+class="form-control">
+</div>
+
+<!-- PASSWORD -->
+<div class="mb-3 input-group">
+<span class="input-group-text">🔒</span>
+<input type="password" name="password"
+placeholder="Create Password"
+class="form-control" minlength="6" required>
+</div>
+<small class="text-muted">Minimum 6 characters</small>
+
+<!-- FILE -->
+<div class="mb-3 mt-2">
+<label class="mb-1">📄 Upload Business Document</label>
+<input type="file" name="document"
+class="form-control"
+accept=".pdf,.jpg,.jpeg,.png">
+<small class="text-muted">Allowed: PDF, JPG, PNG</small>
+</div>
+
+<!-- BUTTON -->
+<button class="btn btn-primary w-100 btn-register">
+🚀 Register Business
+</button>
+
+</form>
+
+<hr>
+
+<div class="text-center">
+<p class="mb-1">Already have an account?</p>
+<a href="/login" class="btn btn-outline-primary btn-sm">Login</a>
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

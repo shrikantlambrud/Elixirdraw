@@ -1,0 +1,25 @@
+{% extends "business/base.html" %}
+
+{% block content %}
+
+<h3>Dashboard</h3>
+
+<div class="row">
+
+<div class="col-md-4">
+<div class="card shadow p-3">
+<h5>Total Properties</h5>
+<p>{{properties|length}}</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card shadow p-3">
+<h5>Wallet Balance</h5>
+<p>₹{{wallet.wallet_balance}}</p>
+</div>
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+<h3>Wallet Requests</h3>
+
+{% set total_amount = 0 %}
+{% set total_requests = requests|length %}
+{% set approved_requests = requests|selectattr("status", "equalto", "Approved")|list|length %}
+{% set pending_requests = total_requests - approved_requests %}
+
+{% for r in requests %}
+    {% set total_amount = total_amount + r.amount %}
+{% endfor %}
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-white bg-primary mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Amount</h5>
+        <p class="card-text">₹{{ total_amount }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-success mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Approved Requests</h5>
+        <p class="card-text">{{ approved_requests }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-warning mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Pending Requests</h5>
+        <p class="card-text">{{ pending_requests }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-info mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Requests</h5>
+        <p class="card-text">{{ total_requests }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Wallet Requests Table -->
+<table class="table table-bordered">
+  <tr>
+    <th>Business</th>
+    <th>Amount</th>
+    <th>UTR</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+
+  {% for r in requests %}
+  <tr>
+    <td>{{ r.business_name }}</td>
+    <td>₹{{ r.amount }}</td>
+    <td>{{ r.utr_number }}</td>
+    <td>{{ r.status }}</td>
+    <td>
+      <a href="/admin/approve_wallet/{{ r.id }}" class="btn btn-success btn-sm">Approve</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

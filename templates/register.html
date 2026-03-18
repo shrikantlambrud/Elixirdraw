@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5" style="max-width:500px;">
+
+<h3 class="mb-4 text-center">Personal Registration</h3>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <input type="text" name="name" placeholder="Full Name"
+        class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <input type="email" name="email" placeholder="Email Address"
+        class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <input type="tel" name="phone" placeholder="Phone Number"
+        pattern="[0-9]{10}" maxlength="10"
+        class="form-control" required>
+        <small class="text-muted">Enter 10 digit mobile number</small>
+    </div>
+
+    <div class="mb-3">
+        <textarea name="address" placeholder="Address"
+        class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <input type="password" name="password" placeholder="Password"
+        class="form-control" minlength="6" required>
+        <small class="text-muted">Minimum 6 characters</small>
+    </div>
+
+    <button class="btn btn-success w-100">Register & Send OTP</button>
+
+</form>
+
+<div class="text-center mt-3">
+    <a href="/login">Already have an account? Login</a>
+</div>
+
+</div>
+
+{% endblock %}

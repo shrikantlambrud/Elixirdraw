@@ -1,0 +1,192 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+<style>
+
+body{
+background:#f4f6f9;
+}
+
+/* HEADER */
+.dashboard-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.dashboard-title{
+font-weight:700;
+font-size:24px;
+}
+
+/* CARD */
+.stat-card{
+border:none;
+border-radius:16px;
+color:white;
+padding:22px;
+transition:0.3s;
+box-shadow:0 8px 25px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+}
+
+.stat-card:hover{
+transform:translateY(-6px);
+box-shadow:0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* ICON */
+.stat-icon{
+font-size:32px;
+opacity:0.9;
+}
+
+/* NUMBER */
+.stat-number{
+font-size:28px;
+font-weight:700;
+margin-top:5px;
+}
+
+/* LABEL */
+.stat-label{
+font-size:14px;
+opacity:0.9;
+}
+
+/* GRADIENT COLORS */
+.bg-users{
+background:linear-gradient(135deg,#4e73df,#224abe);
+}
+
+.bg-business{
+background:linear-gradient(135deg,#1cc88a,#17a673);
+}
+
+.bg-property{
+background:linear-gradient(135deg,#f6c23e,#dda20a);
+}
+
+.bg-wallet{
+background:linear-gradient(135deg,#e74a3b,#be2617);
+}
+
+/* SMALL STATS SECTION */
+.quick-card{
+background:white;
+border-radius:12px;
+padding:15px;
+box-shadow:0 4px 12px rgba(0,0,0,0.05);
+text-align:center;
+transition:0.3s;
+}
+
+.quick-card:hover{
+transform:translateY(-3px);
+}
+
+/* MOBILE FIX */
+@media(max-width:576px){
+.stat-number{
+font-size:22px;
+}
+}
+
+</style>
+
+<div class="container mt-4">
+
+<!-- HEADER -->
+<div class="dashboard-header">
+<h3 class="dashboard-title">📊 Admin Dashboard</h3>
+</div>
+
+<!-- MAIN CARDS -->
+<div class="row g-4">
+
+<!-- USERS -->
+<div class="col-md-3 col-6">
+<div class="stat-card bg-users">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<div class="stat-label">Total Users</div>
+<div class="stat-number">{{total_users}}</div>
+</div>
+<div class="stat-icon">👤</div>
+</div>
+</div>
+</div>
+
+<!-- BUSINESS -->
+<div class="col-md-3 col-6">
+<div class="stat-card bg-business">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<div class="stat-label">Business Users</div>
+<div class="stat-number">{{total_business}}</div>
+</div>
+<div class="stat-icon">🏢</div>
+</div>
+</div>
+</div>
+
+<!-- PROPERTIES -->
+<div class="col-md-3 col-6">
+<div class="stat-card bg-property">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<div class="stat-label">Properties</div>
+<div class="stat-number">{{total_properties}}</div>
+</div>
+<div class="stat-icon">🏠</div>
+</div>
+</div>
+</div>
+
+<!-- WALLET -->
+<div class="col-md-3 col-6">
+<div class="stat-card bg-wallet">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<div class="stat-label">Wallet Requests</div>
+<div class="stat-number">{{wallet_requests}}</div>
+</div>
+<div class="stat-icon">💰</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- EXTRA QUICK INFO -->
+<div class="row mt-4 g-3">
+
+<div class="col-md-4">
+<div class="quick-card">
+<h6>📅 Today</h6>
+<p class="mb-0">Welcome Admin 👋</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="quick-card">
+<h6>🚀 System Status</h6>
+<p class="text-success mb-0">Running Smoothly</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="quick-card">
+<h6>🔔 Notifications</h6>
+<p class="mb-0">No new alerts</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

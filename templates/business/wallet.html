@@ -1,0 +1,79 @@
+{% extends "business/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- WALLET BALANCE CARD -->
+    <div class="card text-white bg-primary mb-4" style="max-width: 22rem;">
+        <div class="card-body">
+            <h5 class="card-title">My Wallet Balance</h5>
+            <h3 class="card-text">₹{{ wallet.wallet_balance }}</h3>
+        </div>
+    </div>
+
+    <!-- ADD MONEY FORM -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Add Money</h5>
+            <form method="POST" action="/business/add_wallet" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input name="amount" class="form-control" placeholder="Amount" required>
+                </div>
+
+                <div class="mb-3">
+                    <input name="utr" class="form-control" placeholder="Enter UTR Number" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Upload Payment Screenshot</label>
+                    <input type="file" name="screenshot" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-success">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAYMENT REQUESTS TABLE -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Payment Requests</h5>
+            {% if requests %}
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Amount</th>
+                            <th>UTR</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in requests %}
+                        <tr>
+                            <td>₹{{ r.amount }}</td>
+                            <td>{{ r.utr_number }}</td>
+                            <td>
+                                {% if r.status == 'approved' %}
+                                <span class="badge bg-success">{{ r.status }}</span>
+                                {% elif r.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">{{ r.status }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ r.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No payment requests found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "business/base.html" %}
+
+{% block content %}
+
+<style>
+
+.page-bg{
+background: linear-gradient(120deg,#0f2027,#2c5364);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.property-card{
+width:100%;
+max-width:450px;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 12px 30px rgba(0,0,0,0.2);
+}
+
+.title{
+text-align:center;
+font-weight:600;
+margin-bottom:20px;
+}
+
+.form-control{
+height:45px;
+border-radius:8px;
+}
+
+textarea.form-control{
+height:auto;
+}
+
+.btn-submit{
+width:100%;
+height:45px;
+border-radius:8px;
+font-weight:600;
+}
+
+.map-preview{
+width:100%;
+height:200px;
+border-radius:8px;
+border:1px solid #ddd;
+margin-bottom:15px;
+}
+
+</style>
+
+<div class="page-bg">
+
+<div class="property-card">
+
+<h3 class="title">Add Property</h3>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input name="title" placeholder="Property Title" class="form-control mb-3" required>
+
+<select name="property_type" id="property_type" class="form-control mb-3" required onchange="showFields()">
+
+<option value="">Select Property Type</option>
+
+<option value="flat">Flat</option>
+
+<option value="plot">Plot</option>
+
+</select>
+
+<div id="flat_fields" style="display:none;">
+
+<select name="flat_type" class="form-control mb-3">
+
+<option value="">Select Flat Type</option>
+
+<option value="single_room">Single Room</option>
+
+<option value="1bhk">1 BHK</option>
+
+<option value="2bhk">2 BHK</option>
+
+<option value="3bhk">3 BHK</option>
+
+</select>
+
+</div>
+
+<div id="plot_fields" style="display:none;">
+
+<input 
+name="plot_size"
+placeholder="Plot Size (Square Feet)"
+class="form-control mb-3">
+
+</div>
+
+<input name="price" placeholder="Price ₹" class="form-control mb-3" required>
+
+<input name="city" placeholder="City" class="form-control mb-3" required>
+
+<input name="area" placeholder="Area / Location" class="form-control mb-3" required>
+
+<input 
+name="contact_number"
+placeholder="Contact Number"
+class="form-control mb-3"
+pattern="[0-9]{10}"
+maxlength="10"
+required>
+
+<input 
+name="map_link"
+id="map_link"
+placeholder="Paste Google Maps Embed Link"
+class="form-control mb-3"
+oninput="loadMap()">
+
+<iframe id="map_preview" class="map-preview" style="display:none;"></iframe>
+
+<label class="mb-1">Property Image</label>
+
+<input type="file" name="image1" class="form-control mb-3">
+
+<textarea name="description" placeholder="Description" class="form-control mb-3"></textarea>
+
+<button class="btn btn-warning btn-submit">
+
+Proceed to Pay ₹10
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+function showFields(){
+
+let type = document.getElementById("property_type").value;
+
+let flat = document.getElementById("flat_fields");
+
+let plot = document.getElementById("plot_fields");
+
+flat.style.display = "none";
+plot.style.display = "none";
+
+if(type === "flat"){
+flat.style.display = "block";
+}
+
+if(type === "plot"){
+plot.style.display = "block";
+}
+
+}
+
+function loadMap(){
+
+let link = document.getElementById("map_link").value;
+
+let frame = document.getElementById("map_preview");
+
+if(link){
+
+frame.style.display = "block";
+
+frame.src = link;
+
+}
+
+}
+
+</script>
+
+{% endblock %}

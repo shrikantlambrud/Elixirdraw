@@ -1,0 +1,81 @@
+{% extends "personal/base.html" %}
+{% block content %}
+
+<style>
+.section-title{
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.custom-card{
+    border:none;
+    border-radius:14px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.custom-card:hover{
+    transform:translateY(-5px);
+}
+
+.custom-img{
+    height:200px;
+    object-fit:cover;
+}
+
+.card-body h5{
+    font-size:15px;
+    font-weight:600;
+}
+
+.info-text{
+    font-size:13px;
+    color:#777;
+}
+
+.price{
+    color:#28a745;
+    font-weight:600;
+}
+</style>
+
+<div class="container">
+
+<h4 class="section-title">🏠 All Properties</h4>
+
+{% if properties %}
+<div class="row g-3">
+{% for p in properties %}
+<div class="col-lg-3 col-md-4 col-sm-6">
+
+<div class="custom-card h-100">
+
+<img src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}" class="w-100 custom-img">
+
+<div class="card-body">
+
+<h5>{{ p.title }}</h5>
+<p class="info-text">🏢 {{ p.business_name }}</p>
+<p class="info-text">📍 {{ p.location }}</p>
+
+{% if p.deposit %}
+<div class="price">₹{{ p.deposit }}</div>
+{% endif %}
+
+<a href="#" class="btn btn-outline-primary btn-sm mt-2">View</a>
+
+</div>
+</div>
+
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p>No properties found.</p>
+{% endif %}
+
+</div>
+
+{% endblock %}

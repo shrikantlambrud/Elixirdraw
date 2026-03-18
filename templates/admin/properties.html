@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+  <h3>🏠 All Properties</h3>
+
+  {% if properties %}
+  <div class="table-responsive mt-3">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Owner</th>
+          <th>Business</th>
+          <th>Price</th>
+          <th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in properties %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td><strong>{{ p.title }}</strong></td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.business_name }}</td>
+          <td>₹{{ p.price }}</td>
+          <td>{{ p.location }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <p class="text-muted">No properties found</p>
+  {% endif %}
+
+</div>
+
+{% endblock %}

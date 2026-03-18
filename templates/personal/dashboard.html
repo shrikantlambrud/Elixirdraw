@@ -1,0 +1,163 @@
+{% extends "personal/base.html" %}
+{% block content %}
+
+<style>
+
+/* CARD */
+.property-card{
+    border:none;
+    border-radius:14px;
+    overflow:hidden;
+    background:#fff;
+    transition:0.3s;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.property-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 12px 26px rgba(0,0,0,0.12);
+}
+
+/* IMAGE */
+.img-wrapper{ position:relative; }
+
+.property-img{
+    height:200px;
+    width:100%;
+    object-fit:cover;
+}
+
+/* PRICE BADGE */
+.price-badge{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    background:#198754;
+    color:#fff;
+    padding:5px 10px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+}
+
+/* TEXT */
+.card-title{
+    font-size:15px;
+    font-weight:600;
+}
+
+.location{
+    font-size:13px;
+    color:#777;
+}
+
+/* ROW */
+.bottom-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    margin-top:10px;
+}
+
+/* DEPOSIT */
+.deposit-box{
+    background:#f1f3f5;
+    padding:6px 8px;
+    border-radius:8px;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+/* BUTTONS */
+.btn-call{
+    background:#0d6efd;
+    color:#fff;
+    border:none;
+}
+
+.btn-whatsapp{
+    background:#25D366;
+    color:#fff;
+    border:none;
+}
+
+.action-btn{
+    font-size:11px;
+    padding:6px;
+    border-radius:8px;
+    flex:1;
+}
+
+/* MOBILE FIX */
+@media(max-width:768px){
+    .property-img{height:160px;}
+    .deposit-box{font-size:10px;}
+}
+
+</style>
+
+<div class="container mt-4 mb-4">
+
+<h4>🏠 Available Properties</h4>
+
+<div class="row g-3">
+
+{% for p in properties %}
+<div class="col-lg-3 col-md-4 col-sm-6">
+
+<div class="card property-card h-100">
+
+<!-- IMAGE -->
+<div class="img-wrapper">
+<img src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}" class="property-img">
+<div class="price-badge">₹{{ p.price }}</div>
+</div>
+
+<div class="card-body">
+
+<h5 class="card-title">{{ p.title }}</h5>
+
+<p class="location">
+📍 {{ p.city }}{% if p.area %}, {{ p.area }}{% endif %}
+</p>
+
+<!-- COMPACT ROW -->
+<div class="bottom-row">
+
+{% if p.deposit %}
+<div class="deposit-box">
+💰 ₹{{ p.deposit }}
+</div>
+{% endif %}
+
+{% if p.contact_number %}
+<a href="tel:{{ p.contact_number }}" class="btn btn-call action-btn">
+📞
+</a>
+
+<a href="https://wa.me/91{{ p.contact_number }}" target="_blank" class="btn btn-whatsapp action-btn">
+💬
+</a>
+{% endif %}
+
+</div>
+
+<!-- MAP -->
+{% if p.map_link %}
+<a href="{{ p.map_link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2 w-100">
+📍 Location
+</a>
+{% endif %}
+
+</div>
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

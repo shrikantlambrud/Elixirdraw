@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h3>Admin Profile</h3>
+
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ admin.name }}</h5>
+                    <p class="card-text"><strong>Email:</strong> {{ admin.email }}</p>
+                    <p class="card-text"><strong>Phone:</strong> {{ admin.phone }}</p>
+                    <p class="card-text"><strong>Status:</strong> {{ admin.status }}</p>
+                </div>
+            </div>
+
+            <!-- Total Received Card -->
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Received Amount</h5>
+                    <p class="card-text">₹{{ total_received }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- You can add more admin stats here or recent activity -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Dashboard Stats</h5>
+                    <p class="card-text">You can add widgets like total businesses, total wallet requests, etc.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

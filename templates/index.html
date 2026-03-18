@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* HERO */
+.hero{
+background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+url('https://images.unsplash.com/photo-1560518883-ce09059eeffa');
+background-size:cover;
+background-position:center;
+color:#fff;
+padding:90px 20px;
+text-align:center;
+border-radius:12px;
+margin-bottom:40px;
+}
+
+.hero h1{
+font-size:42px;
+font-weight:700;
+}
+
+.hero p{
+font-size:18px;
+opacity:0.9;
+}
+
+/* SEARCH */
+.search-box{
+margin-top:20px;
+max-width:600px;
+margin-left:auto;
+margin-right:auto;
+}
+
+/* BUTTONS */
+.hero-buttons{
+margin-top:25px;
+}
+
+.hero-buttons a{
+margin:5px;
+border-radius:8px;
+padding:10px 20px;
+font-weight:600;
+}
+
+/* INFO SECTION */
+.info-section{
+padding:40px 20px;
+text-align:center;
+}
+
+.info-title{
+font-size:28px;
+font-weight:700;
+margin-bottom:20px;
+}
+
+.info-card{
+border:none;
+border-radius:12px;
+padding:25px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+transition:0.3s;
+height:100%;
+}
+
+.info-card:hover{
+transform:translateY(-5px);
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+.info-icon{
+font-size:40px;
+margin-bottom:15px;
+color:#198754;
+}
+
+/* CTA */
+.cta{
+background:#198754;
+color:#fff;
+padding:40px;
+border-radius:12px;
+text-align:center;
+margin-top:40px;
+}
+
+.cta h3{
+font-weight:700;
+margin-bottom:10px;
+}
+
+.cta a{
+margin-top:15px;
+border-radius:8px;
+padding:10px 20px;
+font-weight:600;
+}
+
+</style>
+
+<div class="container mt-4">
+
+<!-- 🔥 HERO SECTION -->
+
+<div class="hero">
+
+<h1>Find Your Dream Property 🏡</h1>
+<p>Buy, Sell, Rent & Construction Materials — All in One Platform</p>
+
+<form method="GET" action="/" class="search-box d-flex">
+<input type="text" name="search" placeholder="Search city, property, material..." class="form-control me-2">
+<button class="btn btn-success">Search</button>
+</form>
+
+<!-- 🔐 LOGIN / REGISTER BUTTONS -->
+
+<div class="hero-buttons">
+
+<a href="/login" class="btn btn-light">Login</a>
+
+<a href="/register" class="btn btn-warning">Register as User</a>
+
+<a href="/business_register" class="btn btn-primary">Register Business</a>
+
+</div>
+
+</div>
+
+<!-- 📌 INFO SECTION -->
+
+<div class="info-section">
+
+<h2 class="info-title">Why Choose Our Platform?</h2>
+
+<div class="row">
+
+<div class="col-md-4 mb-4">
+<div class="info-card">
+<div class="info-icon">🏠</div>
+<h5>Find Properties</h5>
+<p>Browse verified properties for rent, sale, and investment easily.</p>
+</div>
+</div>
+
+<div class="col-md-4 mb-4">
+<div class="info-card">
+<div class="info-icon">🧱</div>
+<h5>Construction Materials</h5>
+<p>Get materials directly from trusted suppliers at best prices.</p>
+</div>
+</div>
+
+<div class="col-md-4 mb-4">
+<div class="info-card">
+<div class="info-icon">📞</div>
+<h5>Direct Contact</h5>
+<p>Call or WhatsApp sellers directly without any broker fees.</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<!-- 🚀 BUSINESS CTA -->
+
+<div class="cta">
+
+<h3>Grow Your Business With Us 🚀</h3>
+<p>List your properties or materials and reach thousands of customers.</p>
+
+<a href="/business_register" class="btn btn-light">Start Selling</a>
+
+</div>
+
+</div>
+
+{% endblock %}

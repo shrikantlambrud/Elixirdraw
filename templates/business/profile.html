@@ -1,0 +1,23 @@
+{% extends "business/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>My Profile</h3>
+
+    {% if business %}
+    <div class="card mb-4" style="max-width: 600px;">
+        <div class="card-body">
+            <h5 class="card-title">{{ business.business_name or 'Business' }}</h5>
+            <p><strong>Name:</strong> {{ business.name or 'N/A' }}</p>
+            <p><strong>Email:</strong> {{ business.email or 'N/A' }}</p>
+            <p><strong>Phone:</strong> {{ business.phone or 'N/A' }}</p>
+            <p><strong>Address:</strong> {{ business.address or 'N/A' }}</p>
+            <p><strong>Udyam No:</strong> {{ business.udyam_no or 'N/A' }}</p>
+            <p><strong>Status:</strong> {{ business.status or 'N/A' }}</p>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-danger">Profile not found.</p>
+    {% endif %}
+</div>
+{% endblock %}
