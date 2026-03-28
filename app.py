@@ -22,8 +22,8 @@ def get_db():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="Shrikant",
-        database="realestate"
+        password="Root@123",
+        database="elixirdraw"
     )
 
 # ---------------- MAIL CONFIG ----------------
