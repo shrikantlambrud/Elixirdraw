@@ -1,191 +1,320 @@
 {% extends "admin/base.html" %}
+{% block title %}Dashboard — Admin Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
 
 <style>
 
-body{
-background:#f4f6f9;
-}
+  /* ── WELCOME BANNER ── */
+  .welcome-banner {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border-radius: 18px;
+    padding: 26px 30px;
+    color: #fff;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
 
-/* HEADER */
-.dashboard-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:25px;
-}
+  .welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
 
-.dashboard-title{
-font-weight:700;
-font-size:24px;
-}
+  .welcome-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 30%;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
 
-/* CARD */
-.stat-card{
-border:none;
-border-radius:16px;
-color:white;
-padding:22px;
-transition:0.3s;
-box-shadow:0 8px 25px rgba(0,0,0,0.08);
-position:relative;
-overflow:hidden;
-}
+  .welcome-text { position: relative; }
 
-.stat-card:hover{
-transform:translateY(-6px);
-box-shadow:0 15px 35px rgba(0,0,0,0.15);
-}
+  .welcome-text h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 4px;
+    letter-spacing: -0.4px;
+  }
 
-/* ICON */
-.stat-icon{
-font-size:32px;
-opacity:0.9;
-}
+  .welcome-text p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    margin: 0;
+  }
 
-/* NUMBER */
-.stat-number{
-font-size:28px;
-font-weight:700;
-margin-top:5px;
-}
+  .welcome-icon {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
 
-/* LABEL */
-.stat-label{
-font-size:14px;
-opacity:0.9;
-}
+  .welcome-icon svg {
+    width: 26px; height: 26px;
+    stroke: #fff; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
 
-/* GRADIENT COLORS */
-.bg-users{
-background:linear-gradient(135deg,#4e73df,#224abe);
-}
+  /* ── STAT CARDS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
 
-.bg-business{
-background:linear-gradient(135deg,#1cc88a,#17a673);
-}
+  .stat-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 12px rgba(14,165,233,0.07);
+    padding: 20px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
 
-.bg-property{
-background:linear-gradient(135deg,#f6c23e,#dda20a);
-}
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(14,165,233,0.14);
+  }
 
-.bg-wallet{
-background:linear-gradient(135deg,#e74a3b,#be2617);
-}
+  .stat-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
 
-/* SMALL STATS SECTION */
-.quick-card{
-background:white;
-border-radius:12px;
-padding:15px;
-box-shadow:0 4px 12px rgba(0,0,0,0.05);
-text-align:center;
-transition:0.3s;
-}
+  .stat-icon svg {
+    width: 22px; height: 22px;
+    fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
 
-.quick-card:hover{
-transform:translateY(-3px);
-}
+  .ic-blue   { background: #e0f2fe; }
+  .ic-blue   svg { stroke: #0284c7; }
+  .ic-green  { background: #dcfce7; }
+  .ic-green  svg { stroke: #16a34a; }
+  .ic-amber  { background: #fef3c7; }
+  .ic-amber  svg { stroke: #d97706; }
+  .ic-red    { background: #fee2e2; }
+  .ic-red    svg { stroke: #dc2626; }
 
-/* MOBILE FIX */
-@media(max-width:576px){
-.stat-number{
-font-size:22px;
-}
-}
+  .stat-info { min-width: 0; }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 4px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.8px;
+    line-height: 1;
+  }
+
+  .stat-number.blue  { color: #0284c7; }
+  .stat-number.green { color: #16a34a; }
+  .stat-number.amber { color: #d97706; }
+  .stat-number.red   { color: #dc2626; }
+
+  /* ── QUICK CARDS ── */
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .quick-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.06);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+
+  .quick-card:hover {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+    transform: translateY(-2px);
+  }
+
+  .quick-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .quick-icon svg {
+    width: 18px; height: 18px;
+    stroke: #0284c7; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .quick-text { min-width: 0; }
+
+  .quick-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 3px;
+  }
+
+  .quick-value {
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .quick-value.success { color: #16a34a; font-weight: 600; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title svg {
+    width: 17px; height: 17px;
+    stroke: #0ea5e9; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
 
 </style>
 
-<div class="container mt-4">
-
-<!-- HEADER -->
-<div class="dashboard-header">
-<h3 class="dashboard-title">📊 Admin Dashboard</h3>
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+  <div class="welcome-text">
+    <h2>Welcome back, {{ admin.name if admin else 'Admin' }}</h2>
+    <p>Here's what's happening on the platform today.</p>
+  </div>
+  <div class="welcome-icon">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+  </div>
 </div>
 
-<!-- MAIN CARDS -->
-<div class="row g-4">
-
-<!-- USERS -->
-<div class="col-md-3 col-6">
-<div class="stat-card bg-users">
-<div class="d-flex justify-content-between align-items-center">
-<div>
-<div class="stat-label">Total Users</div>
-<div class="stat-number">{{total_users}}</div>
-</div>
-<div class="stat-icon">👤</div>
-</div>
-</div>
+<!-- Stat Cards -->
+<div class="section-title">
+  <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+  Platform Overview
 </div>
 
-<!-- BUSINESS -->
-<div class="col-md-3 col-6">
-<div class="stat-card bg-business">
-<div class="d-flex justify-content-between align-items-center">
-<div>
-<div class="stat-label">Business Users</div>
-<div class="stat-number">{{total_business}}</div>
-</div>
-<div class="stat-icon">🏢</div>
-</div>
-</div>
-</div>
+<div class="stats-grid">
 
-<!-- PROPERTIES -->
-<div class="col-md-3 col-6">
-<div class="stat-card bg-property">
-<div class="d-flex justify-content-between align-items-center">
-<div>
-<div class="stat-label">Properties</div>
-<div class="stat-number">{{total_properties}}</div>
-</div>
-<div class="stat-icon">🏠</div>
-</div>
-</div>
-</div>
+  <div class="stat-card">
+    <div class="stat-icon ic-blue">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-number blue">{{ total_users }}</div>
+    </div>
+  </div>
 
-<!-- WALLET -->
-<div class="col-md-3 col-6">
-<div class="stat-card bg-wallet">
-<div class="d-flex justify-content-between align-items-center">
-<div>
-<div class="stat-label">Wallet Requests</div>
-<div class="stat-number">{{wallet_requests}}</div>
-</div>
-<div class="stat-icon">💰</div>
-</div>
-</div>
-</div>
+  <div class="stat-card">
+    <div class="stat-icon ic-green">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Business Users</div>
+      <div class="stat-number green">{{ total_business }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon ic-amber">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Properties</div>
+      <div class="stat-number amber">{{ total_properties }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon ic-red">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Wallet Requests</div>
+      <div class="stat-number red">{{ wallet_requests }}</div>
+    </div>
+  </div>
 
 </div>
 
-<!-- EXTRA QUICK INFO -->
-<div class="row mt-4 g-3">
-
-<div class="col-md-4">
-<div class="quick-card">
-<h6>📅 Today</h6>
-<p class="mb-0">Welcome Admin 👋</p>
-</div>
+<!-- Quick Info -->
+<div class="section-title">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  System Info
 </div>
 
-<div class="col-md-4">
-<div class="quick-card">
-<h6>🚀 System Status</h6>
-<p class="text-success mb-0">Running Smoothly</p>
-</div>
-</div>
+<div class="quick-grid">
 
-<div class="col-md-4">
-<div class="quick-card">
-<h6>🔔 Notifications</h6>
-<p class="mb-0">No new alerts</p>
-</div>
-</div>
+  <div class="quick-card">
+    <div class="quick-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div class="quick-text">
+      <div class="quick-title">Today</div>
+      <div class="quick-value">Welcome, Admin</div>
+    </div>
+  </div>
 
-</div>
+  <div class="quick-card">
+    <div class="quick-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="quick-text">
+      <div class="quick-title">System Status</div>
+      <div class="quick-value success">Running Smoothly</div>
+    </div>
+  </div>
+
+  <div class="quick-card">
+    <div class="quick-icon">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <div class="quick-text">
+      <div class="quick-title">Notifications</div>
+      <div class="quick-value">No new alerts</div>
+    </div>
+  </div>
 
 </div>
 

@@ -1,57 +1,319 @@
 {% extends "admin/base.html" %}
+{% block title %}Approved Users — Admin Panel{% endblock %}
+{% block page_title %}Approved Users{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
+<style>
 
-<h3>✅ Approved Users</h3>
+  .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-{% if users %}
+  .page-title-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    flex-shrink: 0;
+  }
 
-<div class="table-responsive mt-3">
-<table class="table table-bordered table-hover">
+  .page-title-icon svg {
+    width: 20px; height: 20px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
 
-<thead class="table-dark">
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Business</th>
-<th>Email</th>
-<th>Phone</th>
-<th>Role</th>
-<th>Status</th>
-</tr>
-</thead>
+  .table-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 16px rgba(14,165,233,0.07);
+    overflow: hidden;
+  }
 
-<tbody>
+  .table-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #7dd3fc);
+  }
 
-{% for u in users %}
-<tr>
+  .table { margin: 0; width: 100%; border-collapse: collapse; }
 
-<td>{{ u.id }}</td>
-<td>{{ u.name }}</td>
-<td>{{ u.business_name }}</td>
-<td>{{ u.email }}</td>
-<td>{{ u.phone }}</td>
-<td>{{ u.role }}</td>
+  .table thead tr {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
 
-<td>
-<span class="badge bg-success">✔ Approved</span>
-</td>
+  .table thead th {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 13px 18px;
+    border: none;
+    white-space: nowrap;
+  }
 
-</tr>
-{% endfor %}
+  .table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+  }
 
-</tbody>
+  .table tbody tr:last-child { border-bottom: none; }
+  .table tbody tr:hover { background: #f8fafc; }
 
-</table>
-</div>
+  .table tbody td {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #334155;
+    border: none;
+    vertical-align: middle;
+  }
 
-{% else %}
+  /* id chip */
+  .id-chip {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
 
-<p class="text-muted mt-3">No approved users found</p>
+  /* user name with avatar */
+  .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
 
-{% endif %}
+  .user-avatar {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
 
+  .user-name { font-weight: 600; color: #0f172a; }
+
+  /* business chip */
+  .biz-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .biz-chip svg {
+    width: 12px; height: 12px;
+    stroke: #0369a1; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* contact */
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .contact-row svg {
+    width: 13px; height: 13px;
+    stroke: #94a3b8; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* role badge */
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: capitalize;
+  }
+
+  .role-admin    { background: #ede9fe; color: #6d28d9; }
+  .role-business { background: #fef3c7; color: #b45309; }
+  .role-user     { background: #f1f5f9; color: #475569; }
+
+  /* approved badge */
+  .approved-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  .approved-badge svg {
+    width: 12px; height: 12px;
+    stroke: #16a34a; fill: none;
+    stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* empty */
+  .empty-row td { text-align: center; padding: 56px 20px; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .empty-icon {
+    width: 60px; height: 60px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .empty-icon svg {
+    width: 28px; height: 28px;
+    stroke: #0ea5e9; fill: none;
+    stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .empty-state p { font-size: 14px; color: #64748b; margin: 0; }
+
+  .table-scroll { overflow-x: auto; }
+
+</style>
+
+<h3 class="page-title">
+  <div class="page-title-icon">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  Approved Users
+</h3>
+
+<div class="table-card">
+  <div class="table-scroll">
+    <table class="table">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Business</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        {% if users %}
+          {% for u in users %}
+          <tr>
+
+            <td><span class="id-chip">#{{ u.id }}</span></td>
+
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">{{ u.name[:1]|upper if u.name else '?' }}</div>
+                <span class="user-name">{{ u.name }}</span>
+              </div>
+            </td>
+
+            <td>
+              {% if u.business_name %}
+              <span class="biz-chip">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                {{ u.business_name }}
+              </span>
+              {% else %}
+              <span style="color:#94a3b8; font-size:13px;">—</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <div class="contact-row">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                {{ u.email }}
+              </div>
+            </td>
+
+            <td>
+              <div class="contact-row">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                {{ u.phone }}
+              </div>
+            </td>
+
+            <td>
+              <span class="role-badge
+                {% if u.role == 'admin' %}role-admin
+                {% elif u.role == 'business' %}role-business
+                {% else %}role-user{% endif %}">
+                {{ u.role }}
+              </span>
+            </td>
+
+            <td>
+              <span class="approved-badge">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Approved
+              </span>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        {% else %}
+        <tr class="empty-row">
+          <td colspan="7">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+              <p>No approved users found.</p>
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+
+      </tbody>
+
+    </table>
+  </div>
 </div>
 
 {% endblock %}

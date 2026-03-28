@@ -1,136 +1,538 @@
 {% extends "base.html" %}
 
+{% block title %}Business Registration — ElixirDraw{% endblock %}
+
 {% block content %}
 
 <style>
 
-/* CARD */
-.register-card{
-background:#fff;
-border-radius:14px;
-box-shadow:0 8px 25px rgba(0,0,0,0.1);
-padding:30px;
-}
+  /* ── PAGE BACKGROUND ── */
+  .reg-page {
+    min-height: 100vh;
+    background: #f0f9ff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 52px 16px 72px;
+  }
 
-/* TITLE */
-.register-title{
-font-weight:700;
-text-align:center;
-margin-bottom:20px;
-}
+  /* ── OUTER WRAPPER ── */
+  .reg-wrapper {
+    width: 100%;
+    max-width: 760px;
+  }
 
-/* INPUT */
-.form-control{
-border-radius:8px;
-padding:10px;
-}
+  /* ── PAGE HEADING ── */
+  .reg-top {
+    text-align: center;
+    margin-bottom: 28px;
+  }
 
-/* ICON INPUT */
-.input-group-text{
-background:#f1f1f1;
-border-radius:8px 0 0 8px;
-}
+  .reg-top-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 6px 18px rgba(14,165,233,0.28);
+  }
 
-/* BUTTON */
-.btn-register{
-border-radius:8px;
-padding:10px;
-font-weight:600;
-}
+  .reg-top-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
-/* SMALL TEXT */
-small{
-font-size:12px;
-}
+  .reg-top h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    margin: 0 0 6px;
+  }
 
-/* MOBILE */
-@media(max-width:768px){
-.register-card{
-padding:20px;
-}
-}
+  .reg-top p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* ── CARD ── */
+  .register-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 24px rgba(14,165,233,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* sky-blue top strip */
+  .register-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #7dd3fc 100%);
+  }
+
+  .card-body {
+    padding: 36px 40px 40px;
+  }
+
+  /* ── FIELD GROUP ── */
+  .field-group {
+    margin-bottom: 18px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── INPUT GROUP (with icon) ── */
+  .input-group {
+    display: flex;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .input-group:focus-within {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14,165,233,0.13);
+  }
+
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    background: #f0f9ff;
+    border: none;
+    border-right: 1.5px solid #e0f2fe;
+    flex-shrink: 0;
+    border-radius: 0;
+    padding: 0;
+    transition: background 0.15s;
+  }
+
+  .input-group:focus-within .input-group-text {
+    background: #e0f2fe;
+    border-right-color: #bae6fd;
+  }
+
+  .input-group-text svg {
+    width: 17px;
+    height: 17px;
+    stroke: #64a7c0;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.15s;
+  }
+
+  .input-group:focus-within .input-group-text svg {
+    stroke: #0284c7;
+  }
+
+  .input-group .form-control {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .input-group .form-control::placeholder { color: #94a3b8; }
+
+  /* ── STANDALONE CONTROLS ── */
+  .form-control {
+    width: 100%;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14,165,233,0.13);
+    background: #fff;
+  }
+
+  .form-control::placeholder { color: #94a3b8; }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 88px;
+    line-height: 1.55;
+  }
+
+  /* file input */
+  input[type="file"].form-control {
+    padding: 10px 14px;
+    cursor: pointer;
+    color: #64748b;
+  }
+
+  /* ── HINT TEXT ── */
+  .field-hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .field-hint svg {
+    width: 13px;
+    height: 13px;
+    stroke: #94a3b8;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* ── OPTIONAL PILL ── */
+  .optional-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7ab3c8;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 99px;
+    padding: 1px 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ── DIVIDER ── */
+  .field-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 8px 0 20px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0ea5e9;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e0f2fe;
+  }
+
+  /* ── SUBMIT BUTTON ── */
+  .btn-register {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    transition: box-shadow 0.18s, transform 0.12s, opacity 0.15s;
+    box-shadow: 0 4px 14px rgba(14,165,233,0.25);
+  }
+
+  .btn-register svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-register:hover {
+    box-shadow: 0 8px 24px rgba(14,165,233,0.38);
+    transform: translateY(-2px);
+    opacity: 0.95;
+    color: #fff;
+  }
+
+  .btn-register:active {
+    transform: scale(0.985);
+    box-shadow: 0 2px 8px rgba(14,165,233,0.2);
+  }
+
+  /* ── DIVIDER ROW ── */
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 26px 0 22px;
+  }
+
+  .or-divider::before,
+  .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e9f5fb;
+  }
+
+  .or-divider span {
+    font-size: 12px;
+    color: #a0bfcc;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── FOOTER LOGIN LINK ── */
+  .reg-card-footer {
+    text-align: center;
+  }
+
+  .reg-card-footer p {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+
+  .btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 26px;
+    border-radius: 10px;
+    border: 1.5px solid #bae6fd;
+    color: #0284c7;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    text-decoration: none;
+    background: #f0f9ff;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-login svg {
+    width: 15px;
+    height: 15px;
+    stroke: #0284c7;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-login:hover {
+    background: #e0f2fe;
+    border-color: #0ea5e9;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.12);
+    color: #0284c7;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 580px) {
+    .card-body { padding: 28px 22px 32px; }
+    .reg-top h1 { font-size: 20px; }
+  }
 
 </style>
 
-<div class="container mt-5" style="max-width:600px;">
+<div class="reg-page">
+  <div class="reg-wrapper">
 
-<div class="register-card">
+    <!-- Page heading -->
+    <div class="reg-top">
+      <div class="reg-top-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <h1>Business Registration</h1>
+      <p>Create your business account to start listing properties and materials</p>
+    </div>
 
-<h3 class="register-title">🏢 Business Registration</h3>
+    <!-- Card -->
+    <div class="register-card">
+      <div class="card-body">
 
-<form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
 
-<!-- BUSINESS NAME -->
-<div class="mb-3 input-group">
-<span class="input-group-text">🏢</span>
-<input type="text" name="business_name" placeholder="Business Name"
-class="form-control" required>
-</div>
+          <!-- ── Business Info ── -->
+          <div class="section-label">Business Information</div>
 
-<!-- EMAIL -->
-<div class="mb-3 input-group">
-<span class="input-group-text">📧</span>
-<input type="email" name="email" placeholder="Email Address"
-class="form-control" required>
-</div>
+          <!-- BUSINESS NAME -->
+          <div class="field-group">
+            <label class="field-label">Business Name</label>
+            <div class="mb-3 input-group">
+              <span class="input-group-text">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </span>
+              <input type="text" name="business_name" placeholder="e.g. Sharma Properties"
+                     class="form-control" required>
+            </div>
+          </div>
 
-<!-- PHONE -->
-<div class="mb-3 input-group">
-<span class="input-group-text">📱</span>
-<input type="tel" name="phone" placeholder="Phone Number"
-pattern="[0-9]{10}" maxlength="10"
-class="form-control" required>
-</div>
-<small class="text-muted">Enter 10 digit mobile number</small>
+          <!-- ADDRESS -->
+          <div class="field-group">
+            <label class="field-label">Business Address</label>
+            <div class="mb-3 mt-2">
+              <textarea name="address" placeholder="Full address with city and PIN code"
+                        class="form-control" required></textarea>
+            </div>
+          </div>
 
-<!-- ADDRESS -->
-<div class="mb-3 mt-2">
-<textarea name="address" placeholder="Business Address"
-class="form-control" required></textarea>
-</div>
+          <!-- UDYAM -->
+          <div class="field-group">
+            <label class="field-label">
+              Udyam Registration Number
+              <span class="optional-pill">Optional</span>
+            </label>
+            <div class="mb-3 input-group">
+              <span class="input-group-text">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+              </span>
+              <input type="text" name="udyam_no"
+                     placeholder="UDYAM-XX-00-0000000"
+                     class="form-control">
+            </div>
+          </div>
 
-<!-- UDYAM -->
-<div class="mb-3 input-group">
-<span class="input-group-text">🆔</span>
-<input type="text" name="udyam_no"
-placeholder="Udyam Registration Number (Optional)"
-class="form-control">
-</div>
+          <!-- ── Contact ── -->
+          <div class="section-label">Contact Details</div>
 
-<!-- PASSWORD -->
-<div class="mb-3 input-group">
-<span class="input-group-text">🔒</span>
-<input type="password" name="password"
-placeholder="Create Password"
-class="form-control" minlength="6" required>
-</div>
-<small class="text-muted">Minimum 6 characters</small>
+          <!-- EMAIL -->
+          <div class="field-group">
+            <label class="field-label">Email Address</label>
+            <div class="mb-3 input-group">
+              <span class="input-group-text">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input type="email" name="email" placeholder="you@business.com"
+                     class="form-control" required>
+            </div>
+          </div>
 
-<!-- FILE -->
-<div class="mb-3 mt-2">
-<label class="mb-1">📄 Upload Business Document</label>
-<input type="file" name="document"
-class="form-control"
-accept=".pdf,.jpg,.jpeg,.png">
-<small class="text-muted">Allowed: PDF, JPG, PNG</small>
-</div>
+          <!-- PHONE -->
+          <div class="field-group">
+            <label class="field-label">Phone Number</label>
+            <div class="mb-3 input-group">
+              <span class="input-group-text">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </span>
+              <input type="tel" name="phone" placeholder="10-digit mobile number"
+                     pattern="[0-9]{10}" maxlength="10"
+                     class="form-control" required>
+            </div>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Enter 10 digit mobile number
+            </div>
+          </div>
 
-<!-- BUTTON -->
-<button class="btn btn-primary w-100 btn-register">
-🚀 Register Business
-</button>
+          <!-- ── Security ── -->
+          <div class="section-label">Account Security</div>
 
-</form>
+          <!-- PASSWORD -->
+          <div class="field-group">
+            <label class="field-label">Create Password</label>
+            <div class="mb-3 input-group">
+              <span class="input-group-text">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input type="password" name="password"
+                     placeholder="Minimum 6 characters"
+                     class="form-control" minlength="6" required>
+            </div>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Minimum 6 characters
+            </div>
+          </div>
 
-<hr>
+          <!-- ── Document ── -->
+          <div class="section-label">Business Document</div>
 
-<div class="text-center">
-<p class="mb-1">Already have an account?</p>
-<a href="/login" class="btn btn-outline-primary btn-sm">Login</a>
-</div>
+          <!-- FILE -->
+          <div class="field-group">
+            <label class="mb-1">Upload Business Document</label>
+            <input type="file" name="document"
+                   class="form-control"
+                   accept=".pdf,.jpg,.jpeg,.png">
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Allowed: PDF, JPG, PNG
+            </div>
+          </div>
 
-</div>
+          <!-- BUTTON -->
+          <button class="btn btn-primary w-100 btn-register" type="submit">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Register Business
+          </button>
 
+        </form>
+
+        <!-- Divider -->
+        <div class="or-divider"><span>already have an account?</span></div>
+
+        <!-- Login -->
+        <div class="text-center">
+          <p class="mb-1">Already have an account?</p>
+          <a href="/login" class="btn btn-outline-primary btn-sm btn-login">
+            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Login
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 </div>
 
 {% endblock %}

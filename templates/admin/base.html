@@ -2,153 +2,398 @@
 <html lang="en">
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin Panel{% endblock %}</title>
 
-<title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
 
-<style>
-body{
-    background:#f4f6f9;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-/* SIDEBAR */
-.sidebar{
-    height:100vh;
-    background:#1f2937;
-    color:white;
-    position:fixed;
-    width:230px;
-    padding-top:20px;
-}
-
-.sidebar h4{
-    font-weight:600;
-}
-
-.sidebar a{
-    color:#cbd5e1;
-    text-decoration:none;
-    display:block;
-    padding:12px 20px;
-    font-size:15px;
-    transition:0.3s;
-}
-
-.sidebar a i{
-    margin-right:10px;
-}
-
-.sidebar a:hover{
-    background:#374151;
-    color:white;
-    padding-left:25px;
-}
-
-.sidebar .active{
-    background:#2563eb;
-    color:white;
-}
-
-/* CONTENT */
-.content{
-    margin-left:230px;
-    padding:20px;
-}
-
-/* TOPBAR */
-.topbar{
-    background:white;
-    padding:12px 20px;
-    border-radius:10px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.05);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-/* USER */
-.admin-user{
-    font-weight:500;
-}
-
-/* MOBILE */
-@media(max-width:768px){
-    .sidebar{
-        width:100%;
-        height:auto;
-        position:relative;
+    :root {
+      --primary:        #0ea5e9;
+      --primary-dark:   #0284c7;
+      --primary-light:  #e0f2fe;
+      --primary-xlight: #f0f9ff;
+      --white:          #ffffff;
+      --text-dark:      #0f172a;
+      --text-mid:       #334155;
+      --text-muted:     #64748b;
+      --border:         #e2e8f0;
+      --bg-page:        #f0f9ff;
+      --sidebar-w:      240px;
+      --topbar-h:       64px;
+      --font:           'Plus Jakarta Sans', sans-serif;
     }
 
-    .content{
-        margin-left:0;
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-page);
+      color: var(--text-dark);
+      margin: 0;
     }
-}
-</style>
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      box-shadow: 2px 0 12px rgba(14,165,233,0.06);
+      transition: left 0.25s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar-brand-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    }
+
+    .sidebar-brand-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+      line-height: 1.1;
+    }
+
+    .sidebar-brand-name span {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* nav */
+    .sidebar-nav {
+      padding: 14px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px 10px 4px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-mid);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar-link i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+
+    .sidebar-link:hover {
+      background: var(--primary-xlight);
+      color: var(--primary-dark);
+    }
+
+    .sidebar-link:hover i { color: var(--primary); }
+
+    .sidebar-link.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .sidebar-link.active i { color: var(--primary); }
+
+    /* logout */
+    .sidebar-footer {
+      padding: 12px 10px 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logout {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #dc2626;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      transition: background 0.15s;
+    }
+
+    .sidebar-logout i { font-size: 16px; }
+    .sidebar-logout:hover { background: #fee2e2; color: #dc2626; }
+
+    /* ── OVERLAY ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.show { display: block; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(14,165,233,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 900;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.2px;
+    }
+
+    .topbar-toggle {
+      display: none;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--primary-xlight);
+      border: 1px solid var(--primary-light);
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--primary-dark);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* admin pill */
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--primary-xlight);
+      border: 1px solid var(--primary-light);
+      border-radius: 99px;
+      padding: 6px 14px 6px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .content {
+      margin-left: var(--sidebar-w);
+      padding-top: var(--topbar-h);
+      min-height: 100vh;
+    }
+
+    .content-inner { padding: 28px 24px; }
+
+    /* ── CARDS ── */
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(14,165,233,0.07);
+      background: var(--white);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .sidebar { left: calc(-1 * var(--sidebar-w)); }
+      .sidebar.show { left: 0; }
+      .topbar { left: 0; padding: 0 16px; }
+      .topbar-toggle { display: flex; }
+      .content { margin-left: 0; }
+      .content-inner { padding: 20px 14px; }
+    }
+
+  </style>
 
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+  <!-- OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<h4 class="text-center mb-3">⚙️ Admin</h4>
-<hr class="text-secondary">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
 
-<a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">
-    <i class="bi bi-speedometer2"></i> Dashboard
-</a>
-
-<a href="/admin/users" class="{% if request.path == '/admin/users' %}active{% endif %}">
-    <i class="bi bi-people"></i> Users
-</a>
-
-<a href="/admin/business_approval" class="{% if request.path == '/admin/business_approval' %}active{% endif %}">
-    <i class="bi bi-building"></i> Business
-</a>
-
-<a href="/admin/properties" class="{% if request.path == '/admin/properties' %}active{% endif %}">
-    <i class="bi bi-house"></i> Properties
-</a>
-
-<a href="/admin/materials" class="{% if request.path == '/admin/materials' %}active{% endif %}">
-    <i class="bi bi-box"></i> Materials
-</a>
-
-<a href="/admin/wallet_requests" class="{% if request.path == '/admin/wallet_requests' %}active{% endif %}">
-    <i class="bi bi-wallet2"></i> Wallet
-</a>
-
-<a href="/logout" class="text-danger">
-    <i class="bi bi-box-arrow-right"></i> Logout
-</a>
-
-</div>
-
-<!-- CONTENT -->
-<div class="content">
-
-<!-- TOPBAR -->
-<div class="topbar">
-    <div>
-        <h5 class="mb-0">Admin Dashboard</h5>
+    <div class="sidebar-header">
+      <a href="/admin/dashboard" class="sidebar-brand">
+        <div class="sidebar-brand-icon"><i class="bi bi-shield-check"></i></div>
+        <div class="sidebar-brand-name">
+          Admin
+          <span>ElixirDraw Panel</span>
+        </div>
+      </a>
     </div>
 
-    <div class="admin-user">
-        👤 {{ admin.name if admin else 'Admin' }}
+    <nav class="sidebar-nav">
+
+      <div class="sidebar-label">Overview</div>
+
+      <a href="/admin/dashboard"
+         class="sidebar-link {% if request.path == '/admin/dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+
+      <div class="sidebar-label">Management</div>
+
+      <a href="/admin/users"
+         class="sidebar-link {% if request.path == '/admin/users' %}active{% endif %}">
+        <i class="bi bi-people"></i> Users
+      </a>
+
+      <a href="/admin/business_approval"
+         class="sidebar-link {% if request.path == '/admin/business_approval' %}active{% endif %}">
+        <i class="bi bi-building"></i> Business
+      </a>
+
+      <a href="/admin/properties"
+         class="sidebar-link {% if request.path == '/admin/properties' %}active{% endif %}">
+        <i class="bi bi-house"></i> Properties
+      </a>
+
+      <a href="/admin/materials"
+         class="sidebar-link {% if request.path == '/admin/materials' %}active{% endif %}">
+        <i class="bi bi-box"></i> Materials
+      </a>
+
+      <div class="sidebar-label">Finance</div>
+
+      <a href="/admin/wallet_requests"
+         class="sidebar-link {% if request.path == '/admin/wallet_requests' %}active{% endif %}">
+        <i class="bi bi-wallet2"></i> Wallet Requests
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="sidebar-logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
     </div>
-</div>
 
-<!-- PAGE CONTENT -->
-{% block content %}{% endblock %}
+  </aside>
 
-</div>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </div>
+      <span class="topbar-title">{% block page_title %}Admin Dashboard{% endblock %}</span>
+    </div>
+
+    <div class="topbar-user">
+      <div class="user-avatar">
+        {{ admin.name[:1]|upper if admin and admin.name else 'A' }}
+      </div>
+      {{ admin.name if admin else 'Admin' }}
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="content-inner">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('show');
+      document.getElementById('sidebarOverlay').classList.remove('show');
+    }
+
+    (function() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        if (link.getAttribute('href') === path) link.classList.add('active');
+      });
+    })();
+  </script>
+
+  {% block scripts %}{% endblock %}
 
 </body>
 </html>

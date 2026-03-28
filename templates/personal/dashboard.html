@@ -1,162 +1,427 @@
 {% extends "personal/base.html" %}
+{% block title %}Available Properties — Personal Panel{% endblock %}
 {% block content %}
 
 <style>
 
-/* CARD */
-.property-card{
-    border:none;
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-    transition:0.3s;
-    box-shadow:0 4px 14px rgba(0,0,0,0.08);
-}
+  .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.property-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 12px 26px rgba(0,0,0,0.12);
-}
+  .page-title-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    flex-shrink: 0;
+  }
 
-/* IMAGE */
-.img-wrapper{ position:relative; }
+  .page-title-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
-.property-img{
-    height:200px;
-    width:100%;
-    object-fit:cover;
-}
+  /* ── CARD ── */
+  .property-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.07);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* PRICE BADGE */
-.price-badge{
-    position:absolute;
-    bottom:10px;
-    left:10px;
-    background:#198754;
-    color:#fff;
-    padding:5px 10px;
-    border-radius:8px;
-    font-size:13px;
-    font-weight:600;
-}
+  .property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(14,165,233,0.15);
+    border-color: #bae6fd;
+  }
 
-/* TEXT */
-.card-title{
-    font-size:15px;
-    font-weight:600;
-}
+  /* ── IMAGE ── */
+  .property-img-wrap {
+    position: relative;
+    overflow: hidden;
+  }
 
-.location{
-    font-size:13px;
-    color:#777;
-}
+  .property-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
 
-/* ROW */
-.bottom-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:6px;
-    margin-top:10px;
-}
+  .property-card:hover .property-img {
+    transform: scale(1.04);
+  }
 
-/* DEPOSIT */
-.deposit-box{
-    background:#f1f3f5;
-    padding:6px 8px;
-    border-radius:8px;
-    font-size:11px;
-    white-space:nowrap;
-}
+  /* ── BADGE ── */
+  .type-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #0ea5e9;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-/* BUTTONS */
-.btn-call{
-    background:#0d6efd;
-    color:#fff;
-    border:none;
-}
+  .type-badge svg {
+    width: 12px;
+    height: 12px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
-.btn-whatsapp{
-    background:#25D366;
-    color:#fff;
-    border:none;
-}
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 
-.action-btn{
-    font-size:11px;
-    padding:6px;
-    border-radius:8px;
-    flex:1;
-}
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
 
-/* MOBILE FIX */
-@media(max-width:768px){
-    .property-img{height:160px;}
-    .deposit-box{font-size:10px;}
-}
+  /* ── META ROW ── */
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 5px;
+  }
+
+  .meta-row svg {
+    width: 14px;
+    height: 14px;
+    stroke: #94a3b8;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* ── PRICE ── */
+  .price-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0284c7;
+    letter-spacing: -0.4px;
+    margin: 10px 0 6px;
+  }
+
+  .price-text span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  /* ── DIVIDER ── */
+  .card-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 12px 0;
+  }
+
+  /* ── DETAILS ROW ── */
+  .detail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .detail-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0369a1;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 6px;
+    padding: 3px 9px;
+  }
+
+  .detail-chip svg {
+    width: 12px;
+    height: 12px;
+    stroke: #0369a1;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #16a34a;
+    display: inline-block;
+  }
+
+  /* ── BUTTON STACK ── */
+  .btn-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .btn-contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+
+  .btn-contact svg {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  .btn-contact:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .btn-call      { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; box-shadow: 0 3px 10px rgba(14,165,233,0.25); }
+  .btn-whatsapp  { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 3px 10px rgba(34,197,94,0.25); }
+  .btn-map       { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 3px 10px rgba(249,115,22,0.25); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 64px 20px;
+  }
+
+  .empty-icon {
+    width: 72px;
+    height: 72px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .empty-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke: #0ea5e9;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .empty-state h5 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .property-img { height: 170px; }
+  }
 
 </style>
 
-<div class="container mt-4 mb-4">
+<div class="container mt-4 mb-5">
 
-<h4>🏠 Available Properties</h4>
+  <!-- Page Title -->
+  <h3 class="page-title">
+    <div class="page-title-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    Available Properties
+  </h3>
 
-<div class="row g-3">
+  {% if properties %}
 
-{% for p in properties %}
-<div class="col-lg-3 col-md-4 col-sm-6">
+  <div class="row g-3">
 
-<div class="card property-card h-100">
+    {% for p in properties %}
 
-<!-- IMAGE -->
-<div class="img-wrapper">
-<img src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}" class="property-img">
-<div class="price-badge">₹{{ p.price }}</div>
-</div>
+    <div class="col-lg-4 col-md-6 col-sm-12">
+      <div class="property-card">
 
-<div class="card-body">
+        <!-- IMAGE -->
+        <div class="property-img-wrap">
+          {% if p.image1 %}
+          <img src="{{ url_for('static', filename='uploads/' + p.image1) }}" class="property-img" alt="{{ p.title }}">
+          {% else %}
+          <img src="https://via.placeholder.com/400x200" class="property-img" alt="Property">
+          {% endif %}
 
-<h5 class="card-title">{{ p.title }}</h5>
+          <!-- BADGE -->
+          <div class="type-badge">
+            {% if p.property_type == 'flat' %}
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 21V9h6v12"/></svg>
+            Flat
+            {% elif p.property_type == 'room' %}
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Room
+            {% else %}
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Property
+            {% endif %}
+          </div>
+        </div>
 
-<p class="location">
-📍 {{ p.city }}{% if p.area %}, {{ p.area }}{% endif %}
-</p>
+        <!-- BODY -->
+        <div class="card-body">
 
-<!-- COMPACT ROW -->
-<div class="bottom-row">
+          <h5 class="card-title">{{ p.title }}</h5>
 
-{% if p.deposit %}
-<div class="deposit-box">
-💰 ₹{{ p.deposit }}
-</div>
-{% endif %}
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ p.city }}{% if p.area %}, {{ p.area }}{% endif %}
+          </div>
 
-{% if p.contact_number %}
-<a href="tel:{{ p.contact_number }}" class="btn btn-call action-btn">
-📞
-</a>
+          <div class="price-text">
+            ₹{{ p.price }} <span>/ month</span>
+          </div>
 
-<a href="https://wa.me/91{{ p.contact_number }}" target="_blank" class="btn btn-whatsapp action-btn">
-💬
-</a>
-{% endif %}
+          <div class="detail-chips">
+            {% if p.deposit %}
+            <span class="detail-chip">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Deposit ₹{{ p.deposit }}
+            </span>
+            {% endif %}
+            <span class="detail-chip">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              {{ p.created_at }}
+            </span>
+            <span class="status-badge">{{ p.status }}</span>
+          </div>
 
-</div>
+          <hr class="card-divider">
 
-<!-- MAP -->
-{% if p.map_link %}
-<a href="{{ p.map_link }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2 w-100">
-📍 Location
-</a>
-{% endif %}
+          <!-- CONTACT BUTTONS -->
+          <div class="btn-stack">
 
-</div>
-</div>
+            <a href="tel:{{ p.user_phone if p.user_phone else '9999999999' }}"
+               class="btn-contact btn-call">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Call Now
+            </a>
 
-</div>
-{% endfor %}
+            <a href="https://wa.me/91{{ p.user_phone if p.user_phone else '9999999999' }}"
+               target="_blank"
+               class="btn-contact btn-whatsapp">
+              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              WhatsApp
+            </a>
 
-</div>
+            <a href="{{ p.map_link if p.map_link else 'https://maps.google.com' }}"
+               target="_blank"
+               class="btn-contact btn-map">
+              <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              View on Map
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+
+  <div class="empty-state">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h5>No Properties Found</h5>
+    <p>There are no available properties at the moment. Check back soon.</p>
+  </div>
+
+  {% endif %}
 
 </div>
 

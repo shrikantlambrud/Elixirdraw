@@ -2,182 +2,675 @@
 
 {% block content %}
 
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
+  /* ── CSS VARIABLES ── */
+  :root {
+    --primary:       #0ea5e9;
+    --primary-dark:  #0284c7;
+    --primary-light: #e0f2fe;
+    --primary-xlight:#f0f9ff;
+    --accent:        #38bdf8;
+    --white:         #ffffff;
+    --text-dark:     #0f172a;
+    --text-mid:      #334155;
+    --text-muted:    #64748b;
+    --border:        #e2e8f0;
+    --success:       #16a34a;
+    --warning-bg:    #fef9c3;
+    --warning-text:  #854d0e;
+    --radius-sm:     8px;
+    --radius-md:     12px;
+    --radius-lg:     18px;
+    --shadow-sm:     0 1px 4px rgba(14,165,233,0.08);
+    --shadow-md:     0 4px 20px rgba(14,165,233,0.13);
+    --shadow-lg:     0 8px 32px rgba(14,165,233,0.18);
+    --font:          'Plus Jakarta Sans', sans-serif;
+  }
 
-/* HERO */
-.hero{
-background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
-url('https://images.unsplash.com/photo-1560518883-ce09059eeffa');
-background-size:cover;
-background-position:center;
-color:#fff;
-padding:90px 20px;
-text-align:center;
-border-radius:12px;
-margin-bottom:40px;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.hero h1{
-font-size:42px;
-font-weight:700;
-}
+  body, .page-body {
+    font-family: var(--font);
+    background: #f8fafc;
+    color: var(--text-dark);
+  }
 
-.hero p{
-font-size:18px;
-opacity:0.9;
-}
+  
 
-/* SEARCH */
-.search-box{
-margin-top:20px;
-max-width:600px;
-margin-left:auto;
-margin-right:auto;
-}
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-xlight) 0%, #dbeafe 50%, var(--primary-light) 100%);
+    padding: 80px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-/* BUTTONS */
-.hero-buttons{
-margin-top:25px;
-}
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
 
-.hero-buttons a{
-margin:5px;
-border-radius:8px;
-padding:10px 20px;
-font-weight:600;
-}
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
 
-/* INFO SECTION */
-.info-section{
-padding:40px 20px;
-text-align:center;
-}
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1px solid var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-sm);
+  }
 
-.info-title{
-font-size:28px;
-font-weight:700;
-margin-bottom:20px;
-}
+  .hero-badge::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: inline-block;
+  }
 
-.info-card{
-border:none;
-border-radius:12px;
-padding:25px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
-transition:0.3s;
-height:100%;
-}
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    position: relative;
+  }
 
-.info-card:hover{
-transform:translateY(-5px);
-box-shadow:0 8px 20px rgba(0,0,0,0.15);
-}
+  .hero h1 span { color: var(--primary); }
 
-.info-icon{
-font-size:40px;
-margin-bottom:15px;
-color:#198754;
-}
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+    position: relative;
+  }
 
-/* CTA */
-.cta{
-background:#198754;
-color:#fff;
-padding:40px;
-border-radius:12px;
-text-align:center;
-margin-top:40px;
-}
+  /* ── SEARCH BOX ── */
+  .search-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 10px 10px 10px 20px;
+    max-width: 620px;
+    margin: 0 auto 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
 
-.cta h3{
-font-weight:700;
-margin-bottom:10px;
-}
+  .search-card input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-family: var(--font);
+    color: var(--text-dark);
+    background: transparent;
+  }
 
-.cta a{
-margin-top:15px;
-border-radius:8px;
-padding:10px 20px;
-font-weight:600;
-}
+  .search-card input::placeholder { color: var(--text-muted); }
 
+  .search-card button {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 11px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .search-card button:hover { background: var(--primary-dark); }
+
+  /* ── HERO AUTH LINKS ── */
+  .hero-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .btn-hero-login {
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+    background: var(--white);
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .btn-hero-login:hover { border-color: var(--primary); color: var(--primary); }
+
+  .btn-hero-user {
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    background: #fbbf24;
+    color: #451a03;
+    border: none;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .btn-hero-user:hover { background: #f59e0b; }
+
+  .btn-hero-biz {
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    text-decoration: none;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-hero-biz:hover { background: var(--primary-dark); box-shadow: var(--shadow-md); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 0 40px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 64px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .section-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  /* ── FEATURE CARDS ── */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .feat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+    transform-origin: left;
+  }
+
+  .feat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+  .feat-card:hover::before { transform: scaleX(1); }
+
+  .feat-icon {
+    width: 52px; height: 52px;
+    border-radius: var(--radius-md);
+    background: var(--primary-xlight);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 18px;
+    border: 1px solid var(--primary-light);
+  }
+
+  .feat-card h5 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+
+  .feat-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── LISTING PREVIEW CARDS ── */
+  .listing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .listing-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .listing-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+  .listing-img {
+    height: 170px;
+    background: linear-gradient(135deg, var(--primary-light), #bfdbfe);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    position: relative;
+  }
+
+  .listing-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .listing-badge.sale  { background: var(--success); }
+  .listing-badge.rent  { background: #7c3aed; }
+  .listing-badge.material { background: #ea580c; }
+
+  .listing-body { padding: 18px; }
+
+  .listing-price {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+
+  .listing-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .listing-location {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .listing-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+
+  .listing-meta span { display: flex; align-items: center; gap: 4px; }
+
+  /* ── HOW IT WORKS ── */
+  .steps-wrap {
+    background: var(--primary-xlight);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px;
+    border: 1px solid var(--primary-light);
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+    margin-top: 36px;
+  }
+
+  .step-item { text-align: center; }
+
+  .step-num {
+    width: 48px; height: 48px;
+    background: var(--primary);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(14,165,233,0.3);
+  }
+
+  .step-item h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+
+  .step-item p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── CTA BAND ── */
+  .cta-section {
+    background: linear-gradient(120deg, var(--primary) 0%, #38bdf8 100%);
+    border-radius: var(--radius-lg);
+    padding: 56px 40px;
+    text-align: center;
+    margin: 0 40px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 250px; height: 250px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+
+  .cta-section::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+
+  .cta-section p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .cta-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .btn-white {
+    background: var(--white);
+    color: var(--primary-dark);
+    border: none;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    font-family: var(--font);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+
+  .btn-white:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.15); transform: translateY(-2px); }
+
+  .btn-ghost-white {
+    background: rgba(255,255,255,0.15);
+    color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.5);
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    font-family: var(--font);
+    transition: background 0.15s;
+  }
+
+  .btn-ghost-white:hover { background: rgba(255,255,255,0.25); }
+
+  
+
+  /* ── FADE-IN ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge { animation: fadeUp 0.4s ease both; }
+  .hero h1    { animation: fadeUp 0.5s 0.1s ease both; }
+  .hero-sub   { animation: fadeUp 0.5s 0.2s ease both; }
+  .search-card{ animation: fadeUp 0.5s 0.3s ease both; }
+  .hero-auth  { animation: fadeUp 0.5s 0.4s ease both; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+   
+    .hero { padding: 56px 20px 48px; }
+    .stats-bar { padding: 16px 20px; gap: 0; flex-wrap: wrap; }
+    .stat-item { padding: 12px 20px; border-right: none; border-bottom: 1px solid var(--border); width: 50%; }
+    .section { padding: 48px 20px; }
+    .cta-section { margin: 0 20px 48px; padding: 40px 24px; }
+   
+  }
 </style>
 
-<div class="container mt-4">
 
-<!-- 🔥 HERO SECTION -->
 
-<div class="hero">
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">India's #1 Property Platform</div>
 
-<h1>Find Your Dream Property 🏡</h1>
-<p>Buy, Sell, Rent & Construction Materials — All in One Platform</p>
+  <h1>Find Your <span>Dream Property</span><br>Without the Hassle</h1>
 
-<form method="GET" action="/" class="search-box d-flex">
-<input type="text" name="search" placeholder="Search city, property, material..." class="form-control me-2">
-<button class="btn btn-success">Search</button>
-</form>
+  <p class="hero-sub">
+    Buy, sell, rent properties &amp; source construction materials —
+    all in one trusted platform. Zero broker fees.
+  </p>
 
-<!-- 🔐 LOGIN / REGISTER BUTTONS -->
+  <form method="GET" action="{{ url_for('index') }}" class="search-card" role="search">
+    <label for="search-input" class="visually-hidden">Search properties or materials</label>
+    <input
+      id="search-input"
+      type="text"
+      name="search"
+      placeholder="Search city, property type, material..."
+      value="{{ request.args.get('search', '') }}"
+      autocomplete="off"
+    >
+    <button type="submit">🔍 Search</button>
+  </form>
 
-<div class="hero-buttons">
+  <div class="hero-auth">
+    <a href="{{ url_for('login') }}" class="btn-hero-login">Login</a>
+    <a href="{{ url_for('register') }}" class="btn-hero-user">Register as User</a>
+    <a href="{{ url_for('business_register') }}" class="btn-hero-biz">Register Business</a>
+  </div>
+</section>
 
-<a href="/login" class="btn btn-light">Login</a>
-
-<a href="/register" class="btn btn-warning">Register as User</a>
-
-<a href="/business_register" class="btn btn-primary">Register Business</a>
-
+<!-- ── STATS BAR ── -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">12,400+</span>
+    <span class="stat-label">Listed Properties</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">3,800+</span>
+    <span class="stat-label">Verified Sellers</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">200+</span>
+    <span class="stat-label">Cities Covered</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">₹0</span>
+    <span class="stat-label">Broker Fees</span>
+  </div>
 </div>
 
+<!-- ── WHY CHOOSE US ── -->
+<div class="section">
+  <p class="section-label">Why NestFind</p>
+  <h2 class="section-title">Everything you need, in one place</h2>
+  <p class="section-sub">No middlemen. No hidden charges. Just real listings from verified sellers.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🏠</div>
+      <h5>Verified Properties</h5>
+      <p>Every listing is reviewed by our team. Browse with complete confidence — no fake ads.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🧱</div>
+      <h5>Construction Materials</h5>
+      <p>Source cement, steel, tiles and more directly from trusted suppliers at the best prices.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📞</div>
+      <h5>Direct Contact</h5>
+      <p>Call or WhatsApp sellers directly. No broker in between — you save money every time.</p>
+    </div>
+  </div>
 </div>
 
-<!-- 📌 INFO SECTION -->
 
-<div class="info-section">
 
-<h2 class="info-title">Why Choose Our Platform?</h2>
+<!-- ── HOW IT WORKS ── -->
+<div class="section" style="padding-top: 0;">
+  <div class="steps-wrap">
+    <p class="section-label" style="text-align:center;">Simple Process</p>
+    <h2 class="section-title" style="text-align:center; margin-bottom:0;">How it works</h2>
 
-<div class="row">
-
-<div class="col-md-4 mb-4">
-<div class="info-card">
-<div class="info-icon">🏠</div>
-<h5>Find Properties</h5>
-<p>Browse verified properties for rent, sale, and investment easily.</p>
-</div>
-</div>
-
-<div class="col-md-4 mb-4">
-<div class="info-card">
-<div class="info-icon">🧱</div>
-<h5>Construction Materials</h5>
-<p>Get materials directly from trusted suppliers at best prices.</p>
-</div>
-</div>
-
-<div class="col-md-4 mb-4">
-<div class="info-card">
-<div class="info-icon">📞</div>
-<h5>Direct Contact</h5>
-<p>Call or WhatsApp sellers directly without any broker fees.</p>
-</div>
-</div>
-
-</div>
-
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <h5>Create an Account</h5>
+        <p>Sign up for free in under 60 seconds. No credit card required.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <h5>Search or List</h5>
+        <p>Browse thousands of verified listings or post your own property/material.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <h5>Contact Directly</h5>
+        <p>Reach sellers and buyers via call or WhatsApp — zero middlemen.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <h5>Close the Deal</h5>
+        <p>Finalize the deal on your terms. We just make the connection.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- 🚀 BUSINESS CTA -->
-
-<div class="cta">
-
-<h3>Grow Your Business With Us 🚀</h3>
-<p>List your properties or materials and reach thousands of customers.</p>
-
-<a href="/business_register" class="btn btn-light">Start Selling</a>
-
+<!-- ── CTA BAND ── -->
+<div class="cta-section">
+  <h2>Ready to Grow Your Business?</h2>
+  <p>List your properties or construction materials and reach thousands of verified buyers across India.</p>
+  <div class="cta-btns">
+    <a href="{{ url_for('business_register') }}" class="btn-white">Start Selling — It's Free</a>
+    <a href="{{ url_for('register') }}" class="btn-ghost-white">Register as User</a>
+  </div>
 </div>
 
-</div>
 
 {% endblock %}

@@ -2,149 +2,398 @@
 <html lang="en">
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Business Dashboard{% endblock %}</title>
 
-<title>Business Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
 
-<style>
-body {
-    background: #f4f6f9;
-    font-family: Arial, sans-serif;
-    margin: 0;
-}
+    :root {
+      --primary:        #0ea5e9;
+      --primary-dark:   #0284c7;
+      --primary-light:  #e0f2fe;
+      --primary-xlight: #f0f9ff;
+      --white:          #ffffff;
+      --text-dark:      #0f172a;
+      --text-mid:       #334155;
+      --text-muted:     #64748b;
+      --border:         #e2e8f0;
+      --bg-page:        #f0f9ff;
+      --sidebar-w:      240px;
+      --topbar-h:       64px;
+      --font:           'Plus Jakarta Sans', sans-serif;
+    }
 
-/* SIDEBAR */
-.sidebar {
-    height: 100vh;
-    background: #212529;
-    color: white;
-    padding-top: 20px;
-    position: fixed;
-    width: 220px;
-    overflow-y: auto;
-    transition: all 0.3s;
-    z-index: 1000;
-}
+    *, *::before, *::after { box-sizing: border-box; }
 
-.sidebar h4 {
-    text-align: center;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
+    body {
+      font-family: var(--font);
+      background: var(--bg-page);
+      color: var(--text-dark);
+      margin: 0;
+    }
 
-.sidebar a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    padding: 12px 20px;
-    transition: 0.3s;
-    border-radius: 5px;
-}
-
-.sidebar a:hover,
-.sidebar a.active {
-    background: #343a40;
-    padding-left: 25px;
-}
-
-/* CONTENT */
-.content {
-    margin-left: 220px;
-    padding: 20px;
-    transition: all 0.3s;
-}
-
-/* TOPBAR */
-.topbar {
-    background: white;
-    padding: 12px 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* TOPBAR BUSINESS NAME */
-.admin-user {
-    font-weight: 500;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
+    /* ── SIDEBAR ── */
     .sidebar {
-        left: -220px;
-        position: fixed;
-        top: 0;
-        height: 100%;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      box-shadow: 2px 0 12px rgba(14,165,233,0.06);
+      transition: left 0.25s ease;
+      overflow-y: auto;
     }
-    .sidebar.show {
-        left: 0;
+
+    /* sidebar top accent */
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
     }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar-brand-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    }
+
+    .sidebar-brand-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+      line-height: 1.1;
+    }
+
+    .sidebar-brand-name span { color: var(--primary); display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); }
+
+    /* nav links */
+    .sidebar-nav {
+      padding: 14px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px 10px 4px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-mid);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar-link i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+
+    .sidebar-link:hover {
+      background: var(--primary-xlight);
+      color: var(--primary-dark);
+    }
+
+    .sidebar-link:hover i { color: var(--primary); }
+
+    .sidebar-link.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .sidebar-link.active i { color: var(--primary); }
+
+    /* logout */
+    .sidebar-footer {
+      padding: 12px 10px 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logout {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #dc2626;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      transition: background 0.15s;
+    }
+
+    .sidebar-logout i { font-size: 16px; }
+    .sidebar-logout:hover { background: #fee2e2; color: #dc2626; }
+
+    /* ── OVERLAY (mobile) ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.show { display: block; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(14,165,233,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 900;
+      gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.2px;
+    }
+
+    .topbar-toggle {
+      display: none;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--primary-xlight);
+      border: 1px solid var(--primary-light);
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--primary-dark);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* user pill */
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--primary-xlight);
+      border: 1px solid var(--primary-light);
+      border-radius: 99px;
+      padding: 6px 14px 6px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN CONTENT ── */
     .content {
-        margin-left: 0;
+      margin-left: var(--sidebar-w);
+      padding-top: var(--topbar-h);
+      min-height: 100vh;
     }
-    .sidebar-toggle {
-        display: inline-block;
-        cursor: pointer;
+
+    .content-inner {
+      padding: 28px 24px;
     }
-}
-</style>
+
+    /* ── CARDS (for child pages) ── */
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(14,165,233,0.07);
+      background: var(--white);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(14,165,233,0.13);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .sidebar { left: calc(-1 * var(--sidebar-w)); }
+      .sidebar.show { left: 0; }
+      .topbar { left: 0; padding: 0 16px; }
+      .topbar-toggle { display: flex; }
+      .content { margin-left: 0; }
+      .content-inner { padding: 20px 14px; }
+    }
+
+  </style>
 
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
+  <!-- ── OVERLAY ── -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Sidebar -->
-        <div class="col-md-2 sidebar" id="sidebar">
-            <h4>Business</h4>
-            <hr>
-            <a href="/business/dashboard" class="{% if request.path == '/business/dashboard' %}active{% endif %}">Dashboard</a>
-            <a href="/business/add_property" class="{% if request.path == '/business/add_property' %}active{% endif %}">Add Property</a>
-            <a href="/business/add_material" class="{% if request.path == '/business/add_material' %}active{% endif %}">Add Material</a>
-            <a href="/business/wallet" class="{% if request.path == '/business/wallet' %}active{% endif %}">Wallet</a>
-            <a href="/business/profile" class="{% if request.path == '/business/profile' %}active{% endif %}">Profile</a>
-            <a href="/logout" class="text-danger">Logout</a>
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+      <a href="/business/dashboard" class="sidebar-brand">
+        <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
+        <div class="sidebar-brand-name">
+          Business
+          <span>ElixirDraw Panel</span>
         </div>
-
-        <!-- Content -->
-        <div class="col-md-10 content">
-
-            <!-- Topbar -->
-            <div class="topbar">
-                <div>
-                    <span class="sidebar-toggle d-md-none" onclick="toggleSidebar()">
-                        <i class="bi bi-list fs-3"></i>
-                    </span>
-                    <span class="navbar-brand mb-0 h5 ms-2">Business Dashboard</span>
-                </div>
-                <div class="admin-user">
-                    👤 {{ business.business_name if business else 'Business' }}
-                </div>
-            </div>
-
-            <!-- Page Content -->
-            {% block content %}
-            {% endblock %}
-
-        </div>
-
+      </a>
     </div>
-</div>
 
-<script>
-// Toggle sidebar on mobile
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('show');
-}
-</script>
+    <nav class="sidebar-nav">
+
+      <div class="sidebar-label">Main</div>
+
+      <a href="/business/dashboard"
+         class="sidebar-link {% if request.path == '/business/dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+
+      <div class="sidebar-label">Listings</div>
+
+      <a href="/business/add_property"
+         class="sidebar-link {% if request.path == '/business/add_property' %}active{% endif %}">
+        <i class="bi bi-house-door"></i> Add Property
+      </a>
+
+      <a href="/business/add_material"
+         class="sidebar-link {% if request.path == '/business/add_material' %}active{% endif %}">
+        <i class="bi bi-box"></i> Add Material
+      </a>
+
+      <div class="sidebar-label">Account</div>
+
+      <a href="/business/wallet"
+         class="sidebar-link {% if request.path == '/business/wallet' %}active{% endif %}">
+        <i class="bi bi-wallet2"></i> Wallet
+      </a>
+
+      <a href="/business/profile"
+         class="sidebar-link {% if request.path == '/business/profile' %}active{% endif %}">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="sidebar-logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </div>
+      <span class="topbar-title">{% block page_title %}Business Dashboard{% endblock %}</span>
+    </div>
+
+    <div class="topbar-user">
+      <div class="user-avatar">
+        {{ business.business_name[:1]|upper if business and business.business_name else 'B' }}
+      </div>
+      {{ business.business_name if business else 'Business' }}
+    </div>
+  </header>
+
+  <!-- ── CONTENT ── -->
+  <main class="content">
+    <div class="content-inner">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('show');
+      document.getElementById('sidebarOverlay').classList.remove('show');
+    }
+
+    /* auto-highlight active link */
+    (function() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        if (link.getAttribute('href') === path) link.classList.add('active');
+      });
+    })();
+  </script>
+
+  {% block scripts %}{% endblock %}
 
 </body>
 </html>

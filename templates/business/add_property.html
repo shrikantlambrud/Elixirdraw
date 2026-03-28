@@ -1,186 +1,431 @@
 {% extends "business/base.html" %}
+{% block title %}Add Property — Business Panel{% endblock %}
+{% block page_title %}Add Property{% endblock %}
 
 {% block content %}
 
 <style>
 
-.page-bg{
-background: linear-gradient(120deg,#0f2027,#2c5364);
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
-}
+  .form-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 24px rgba(14,165,233,0.08);
+    overflow: hidden;
+    max-width: 540px;
+    margin: 0 auto;
+  }
 
-.property-card{
-width:100%;
-max-width:450px;
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 12px 30px rgba(0,0,0,0.2);
-}
+  .form-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #7dd3fc);
+  }
 
-.title{
-text-align:center;
-font-weight:600;
-margin-bottom:20px;
-}
+  .form-card-body { padding: 32px 36px 36px; }
 
-.form-control{
-height:45px;
-border-radius:8px;
-}
+  .card-heading {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
 
-textarea.form-control{
-height:auto;
-}
+  .card-heading svg {
+    width: 20px; height: 20px;
+    stroke: #0ea5e9; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
 
-.btn-submit{
-width:100%;
-height:45px;
-border-radius:8px;
-font-weight:600;
-}
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0ea5e9;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-.map-preview{
-width:100%;
-height:200px;
-border-radius:8px;
-border:1px solid #ddd;
-margin-bottom:15px;
-}
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e0f2fe;
+  }
+
+  /* ── FIELD ── */
+  .field-group { margin-bottom: 18px; }
+
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 7px;
+  }
+
+  /* ── INPUT WRAP ── */
+  .input-wrap {
+    display: flex;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14,165,233,0.13);
+  }
+
+  .input-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 46px;
+    background: #f0f9ff;
+    border-right: 1.5px solid #e0f2fe;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .input-wrap:focus-within .input-icon { background: #e0f2fe; border-right-color: #bae6fd; }
+
+  .input-icon svg {
+    width: 17px; height: 17px;
+    stroke: #64a7c0; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    transition: stroke 0.15s;
+  }
+
+  .input-wrap:focus-within .input-icon svg { stroke: #0284c7; }
+
+  .input-wrap .form-control {
+    flex: 1; border: none; border-radius: 0;
+    padding: 12px 14px; font-size: 14px;
+    color: #0f172a; background: transparent;
+    box-shadow: none; outline: none;
+    font-family: inherit; height: 46px;
+  }
+
+  .input-wrap .form-control::placeholder { color: #94a3b8; }
+
+  /* select inside wrap */
+  .input-wrap select.form-control {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  /* textarea */
+  .input-wrap.textarea-wrap { align-items: flex-start; }
+  .input-wrap.textarea-wrap .input-icon { padding-top: 13px; align-items: flex-start; height: auto; }
+  .input-wrap .form-control.textarea-ctrl {
+    height: auto; min-height: 88px;
+    resize: vertical; line-height: 1.55; padding-top: 12px;
+  }
+
+  /* ── CONDITIONAL FIELDS ── */
+  .conditional-field {
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MAP PREVIEW ── */
+  .map-preview {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    border: 1.5px solid #bae6fd;
+    margin-top: 10px;
+    display: none;
+    background: #f0f9ff;
+  }
+
+  /* ── FILE UPLOAD ── */
+  .file-wrap {
+    border: 2px dashed #bae6fd;
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    background: #f0f9ff;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .file-wrap:hover { border-color: #0ea5e9; background: #e0f2fe; }
+
+  .file-wrap input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .file-wrap-icon { font-size: 26px; color: #0ea5e9; margin-bottom: 5px; display: block; }
+  .file-wrap-text { font-size: 13px; font-weight: 600; color: #0284c7; }
+  .file-wrap-hint { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+  /* ── PAY BUTTON ── */
+  .btn-submit {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.28);
+    transition: box-shadow 0.18s, transform 0.12s, opacity 0.15s;
+    margin-top: 8px;
+  }
+
+  .btn-submit svg {
+    width: 18px; height: 18px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .btn-submit:hover {
+    box-shadow: 0 8px 24px rgba(245,158,11,0.40);
+    transform: translateY(-2px); opacity: 0.95; color: #fff;
+  }
+
+  .btn-submit:active { transform: scale(0.985); }
+
+  /* pay hint */
+  .pay-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .pay-hint svg {
+    width: 13px; height: 13px;
+    stroke: #94a3b8; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  @media (max-width: 580px) {
+    .form-card-body { padding: 24px 20px 28px; }
+  }
 
 </style>
 
-<div class="page-bg">
+<div class="form-card">
+  <div class="form-card-body">
 
-<div class="property-card">
+    <div class="card-heading">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Add Property
+    </div>
 
-<h3 class="title">Add Property</h3>
+    <form method="POST" enctype="multipart/form-data">
 
-<form method="POST" enctype="multipart/form-data">
+      <!-- ── Property Info ── -->
+      <div class="section-label">Property Details</div>
 
-<input name="title" placeholder="Property Title" class="form-control mb-3" required>
+      <div class="field-group">
+        <label class="field-label">Property Title</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <input name="title" class="form-control" placeholder="Property Title" required>
+        </div>
+      </div>
 
-<select name="property_type" id="property_type" class="form-control mb-3" required onchange="showFields()">
+      <div class="field-group">
+        <label class="field-label">Property Type</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 21V9h6v12"/></svg>
+          </div>
+          <select name="property_type" id="property_type" class="form-control" required onchange="showFields()">
+            <option value="">Select Property Type</option>
+            <option value="flat">Flat</option>
+            <option value="plot">Plot</option>
+          </select>
+        </div>
+      </div>
 
-<option value="">Select Property Type</option>
+      <!-- Flat fields -->
+      <div id="flat_fields" class="conditional-field field-group">
+        <label class="field-label">Flat Type</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 21V9h6v12"/></svg>
+          </div>
+          <select name="flat_type" class="form-control">
+            <option value="">Select Flat Type</option>
+            <option value="single_room">Single Room</option>
+            <option value="1bhk">1 RK</option>
+            <option value="1bhk">1 BHK</option>
+            <option value="1bhk">2 BHK</option>
+            <option value="2bhk">3 BHK</option>
+            <option value="3bhk">Other</option>
+          </select>
+        </div>
+      </div>
 
-<option value="flat">Flat</option>
+      <!-- Plot fields -->
+      <div id="plot_fields" class="conditional-field field-group">
+        <label class="field-label">Plot Size</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          </div>
+          <input name="plot_size" class="form-control" placeholder="Plot size in square feet">
+        </div>
+      </div>
 
-<option value="plot">Plot</option>
+      <div class="field-group">
+        <label class="field-label">Price</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <input name="price" class="form-control" placeholder="Price ₹" required>
+        </div>
+      </div>
 
-</select>
+      <!-- ── Location ── -->
+      <div class="section-label">Location</div>
 
-<div id="flat_fields" style="display:none;">
+      <div class="field-group">
+        <label class="field-label">City</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <input name="city" class="form-control" placeholder="City" required>
+        </div>
+      </div>
 
-<select name="flat_type" class="form-control mb-3">
+      <div class="field-group">
+        <label class="field-label">Area / Location</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          </div>
+          <input name="area" class="form-control" placeholder="Area / Location" required>
+        </div>
+      </div>
 
-<option value="">Select Flat Type</option>
+      <div class="field-group">
+        <label class="field-label">Google Maps Embed Link</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <input name="map_link" id="map_link" class="form-control"
+                 placeholder="Paste Google Maps embed URL" oninput="loadMap()">
+        </div>
+        <iframe id="map_preview" class="map-preview"></iframe>
+      </div>
 
-<option value="single_room">Single Room</option>
+      <!-- ── Contact ── -->
+      <div class="section-label">Contact</div>
 
-<option value="1bhk">1 BHK</option>
+      <div class="field-group">
+        <label class="field-label">Contact Number</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <input name="contact_number" class="form-control" placeholder="10-digit contact number"
+                 pattern="[0-9]{10}" maxlength="10" required>
+        </div>
+      </div>
 
-<option value="2bhk">2 BHK</option>
+      <!-- ── Media ── -->
+      <div class="section-label">Image & Description</div>
 
-<option value="3bhk">3 BHK</option>
+      <div class="field-group">
+        <label class="field-label">Property Image</label>
+        <div class="file-wrap">
+          <input type="file" name="image1" onchange="updateFileLabel(this)">
+          <i class="bi bi-cloud-arrow-up file-wrap-icon"></i>
+          <div class="file-wrap-text" id="fileLabel">Click to upload image</div>
+          <div class="file-wrap-hint">JPG, PNG supported</div>
+        </div>
+      </div>
 
-</select>
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <div class="input-wrap textarea-wrap">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          </div>
+          <textarea name="description" class="form-control textarea-ctrl"
+                    placeholder="Property description..."></textarea>
+        </div>
+      </div>
 
-</div>
+      <button type="submit" class="btn-submit">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Proceed to Pay ₹10
+      </button>
 
-<div id="plot_fields" style="display:none;">
+      <div class="pay-hint">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        One-time listing fee — secure payment
+      </div>
 
-<input 
-name="plot_size"
-placeholder="Plot Size (Square Feet)"
-class="form-control mb-3">
-
-</div>
-
-<input name="price" placeholder="Price ₹" class="form-control mb-3" required>
-
-<input name="city" placeholder="City" class="form-control mb-3" required>
-
-<input name="area" placeholder="Area / Location" class="form-control mb-3" required>
-
-<input 
-name="contact_number"
-placeholder="Contact Number"
-class="form-control mb-3"
-pattern="[0-9]{10}"
-maxlength="10"
-required>
-
-<input 
-name="map_link"
-id="map_link"
-placeholder="Paste Google Maps Embed Link"
-class="form-control mb-3"
-oninput="loadMap()">
-
-<iframe id="map_preview" class="map-preview" style="display:none;"></iframe>
-
-<label class="mb-1">Property Image</label>
-
-<input type="file" name="image1" class="form-control mb-3">
-
-<textarea name="description" placeholder="Description" class="form-control mb-3"></textarea>
-
-<button class="btn btn-warning btn-submit">
-
-Proceed to Pay ₹10
-
-</button>
-
-</form>
-
-</div>
-
+    </form>
+  </div>
 </div>
 
 <script>
+  function showFields() {
+    const type = document.getElementById('property_type').value;
+    document.getElementById('flat_fields').style.display = type === 'flat' ? 'block' : 'none';
+    document.getElementById('plot_fields').style.display = type === 'plot' ? 'block' : 'none';
+  }
 
-function showFields(){
+  function loadMap() {
+    const link = document.getElementById('map_link').value;
+    const frame = document.getElementById('map_preview');
+    if (link) { frame.style.display = 'block'; frame.src = link; }
+    else { frame.style.display = 'none'; }
+  }
 
-let type = document.getElementById("property_type").value;
-
-let flat = document.getElementById("flat_fields");
-
-let plot = document.getElementById("plot_fields");
-
-flat.style.display = "none";
-plot.style.display = "none";
-
-if(type === "flat"){
-flat.style.display = "block";
-}
-
-if(type === "plot"){
-plot.style.display = "block";
-}
-
-}
-
-function loadMap(){
-
-let link = document.getElementById("map_link").value;
-
-let frame = document.getElementById("map_preview");
-
-if(link){
-
-frame.style.display = "block";
-
-frame.src = link;
-
-}
-
-}
-
+  function updateFileLabel(input) {
+    const label = document.getElementById('fileLabel');
+    if (input.files && input.files.length > 0) {
+      label.textContent = input.files[0].name;
+      label.style.color = '#0284c7';
+    } else {
+      label.textContent = 'Click to upload image';
+      label.style.color = '';
+    }
+  }
 </script>
 
 {% endblock %}

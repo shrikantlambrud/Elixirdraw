@@ -1,24 +1,310 @@
 {% extends "business/base.html" %}
+{% block title %}Dashboard — Business Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
 
-<h3>Dashboard</h3>
+<style>
 
-<div class="row">
+  /* ── WELCOME BANNER ── */
+  .welcome-banner {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border-radius: 18px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
 
-<div class="col-md-4">
-<div class="card shadow p-3">
-<h5>Total Properties</h5>
-<p>{{properties|length}}</p>
-</div>
+  .welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+
+  .welcome-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 30%;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+
+  .welcome-text { position: relative; }
+
+  .welcome-text h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 4px;
+    letter-spacing: -0.4px;
+  }
+
+  .welcome-text p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    margin: 0;
+  }
+
+  .welcome-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .welcome-icon svg {
+    width: 28px; height: 28px;
+    stroke: #fff; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 12px rgba(14,165,233,0.07);
+    padding: 22px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(14,165,233,0.14);
+  }
+
+  .stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stat-icon svg {
+    width: 22px; height: 22px;
+    fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .ic-blue  { background: #e0f2fe; }
+  .ic-blue svg  { stroke: #0284c7; }
+  .ic-green { background: #dcfce7; }
+  .ic-green svg { stroke: #16a34a; }
+  .ic-amber { background: #fef3c7; }
+  .ic-amber svg { stroke: #d97706; }
+
+  .stat-info { min-width: 0; }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.6px;
+    line-height: 1;
+  }
+
+  .stat-value.blue  { color: #0284c7; }
+  .stat-value.green { color: #16a34a; }
+
+  /* ── QUICK ACTIONS ── */
+  .section-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title svg {
+    width: 18px; height: 18px;
+    stroke: #0ea5e9; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .action-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+
+  .action-card:hover {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(14,165,233,0.12);
+  }
+
+  .action-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .action-icon svg {
+    width: 18px; height: 18px;
+    stroke: #0284c7; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .action-text { min-width: 0; }
+
+  .action-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .action-sub {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .action-arrow {
+    margin-left: auto;
+    color: #94a3b8;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+</style>
+
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+  <div class="welcome-text">
+    <h2>Welcome back, {{ business.business_name if business else 'Business' }}</h2>
+    <p>Here's a summary of your business activity.</p>
+  </div>
+  <div class="welcome-icon">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
 </div>
 
-<div class="col-md-4">
-<div class="card shadow p-3">
-<h5>Wallet Balance</h5>
-<p>₹{{wallet.wallet_balance}}</p>
+<!-- Stat Cards -->
+<div class="stats-row">
+
+  <div class="stat-card">
+    <div class="stat-icon ic-blue">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Total Properties</div>
+      <div class="stat-value blue">{{ properties|length }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon ic-green">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    </div>
+    <div class="stat-info">
+      <div class="stat-label">Wallet Balance</div>
+      <div class="stat-value green">₹{{ wallet.wallet_balance }}</div>
+    </div>
+  </div>
+
 </div>
+
+<!-- Quick Actions -->
+<div class="section-title">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+  Quick Actions
 </div>
+
+<div class="quick-actions">
+
+  <a href="/business/add_property" class="action-card">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Add Property</div>
+      <div class="action-sub">List a new property</div>
+    </div>
+    <i class="bi bi-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/business/add_material" class="action-card">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Add Material</div>
+      <div class="action-sub">List construction material</div>
+    </div>
+    <i class="bi bi-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/business/wallet" class="action-card">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Wallet</div>
+      <div class="action-sub">Manage your balance</div>
+    </div>
+    <i class="bi bi-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/business/profile" class="action-card">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+    <div class="action-text">
+      <div class="action-title">Profile</div>
+      <div class="action-sub">View & edit your details</div>
+    </div>
+    <i class="bi bi-chevron-right action-arrow"></i>
+  </a>
 
 </div>
 

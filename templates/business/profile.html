@@ -1,23 +1,248 @@
 {% extends "business/base.html" %}
+{% block title %}My Profile — Business Panel{% endblock %}
+{% block page_title %}My Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>My Profile</h3>
 
-    {% if business %}
-    <div class="card mb-4" style="max-width: 600px;">
-        <div class="card-body">
-            <h5 class="card-title">{{ business.business_name or 'Business' }}</h5>
-            <p><strong>Name:</strong> {{ business.name or 'N/A' }}</p>
-            <p><strong>Email:</strong> {{ business.email or 'N/A' }}</p>
-            <p><strong>Phone:</strong> {{ business.phone or 'N/A' }}</p>
-            <p><strong>Address:</strong> {{ business.address or 'N/A' }}</p>
-            <p><strong>Udyam No:</strong> {{ business.udyam_no or 'N/A' }}</p>
-            <p><strong>Status:</strong> {{ business.status or 'N/A' }}</p>
+<style>
+
+  .profile-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 20px rgba(14,165,233,0.08);
+    overflow: hidden;
+    max-width: 600px;
+  }
+
+  .profile-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #7dd3fc);
+  }
+
+  .profile-card-body { padding: 28px 32px 32px; }
+
+  /* ── AVATAR ROW ── */
+  .profile-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .profile-avatar {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(14,165,233,0.28);
+    letter-spacing: -1px;
+  }
+
+  .profile-headline h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    margin: 0 0 6px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .badge-active   { background: #dcfce7; color: #15803d; }
+  .badge-active::before { background: #16a34a; }
+  .badge-pending  { background: #fef9c3; color: #854d0e; }
+  .badge-pending::before { background: #ca8a04; }
+  .badge-default  { background: #f1f5f9; color: #64748b; }
+  .badge-default::before { background: #94a3b8; }
+
+  /* ── DETAIL GRID ── */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .detail-item:hover { background: #f0f9ff; border-color: #bae6fd; }
+
+  .detail-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .detail-icon svg {
+    width: 15px; height: 15px;
+    stroke: #0284c7; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .detail-text { min-width: 0; }
+
+  .detail-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+
+  .detail-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+  }
+
+  .detail-value.muted { color: #94a3b8; font-weight: 400; font-style: italic; }
+
+  /* full-width item */
+  .detail-item.full { grid-column: 1 / -1; }
+
+  /* ── NOT FOUND ── */
+  .not-found {
+    text-align: center;
+    padding: 56px 20px;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  @media (max-width: 560px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .profile-card-body { padding: 22px 18px 24px; }
+    .profile-top { flex-direction: column; text-align: center; }
+  }
+
+</style>
+
+<div class="container mt-2 mb-5">
+
+  {% if business %}
+
+  <div class="profile-card">
+    <div class="profile-card-body">
+
+      <!-- Avatar + name -->
+      <div class="profile-top">
+        <div class="profile-avatar">
+          {{ business.business_name[:1]|upper if business.business_name else 'B' }}
         </div>
+        <div class="profile-headline">
+          <h2>{{ business.business_name or 'Business' }}</h2>
+          {% if business.status == 'active' %}
+            <span class="status-badge badge-active">Active</span>
+          {% elif business.status == 'pending' %}
+            <span class="status-badge badge-pending">Pending</span>
+          {% else %}
+            <span class="status-badge badge-default">{{ business.status or 'N/A' }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Detail grid -->
+      <div class="detail-grid">
+
+        <div class="detail-item">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Owner Name</div>
+            <div class="detail-value {% if not business.name %}muted{% endif %}">{{ business.name or 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Email</div>
+            <div class="detail-value {% if not business.email %}muted{% endif %}">{{ business.email or 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Phone</div>
+            <div class="detail-value {% if not business.phone %}muted{% endif %}">{{ business.phone or 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Udyam No</div>
+            <div class="detail-value {% if not business.udyam_no %}muted{% endif %}">{{ business.udyam_no or 'N/A' }}</div>
+          </div>
+        </div>
+
+        <div class="detail-item full">
+          <div class="detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Address</div>
+            <div class="detail-value {% if not business.address %}muted{% endif %}">{{ business.address or 'N/A' }}</div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
-    {% else %}
-    <p class="text-danger">Profile not found.</p>
-    {% endif %}
+  </div>
+
+  {% else %}
+
+  <div class="profile-card" style="max-width:600px;">
+    <div class="not-found">Profile not found.</div>
+  </div>
+
+  {% endif %}
+
 </div>
+
 {% endblock %}

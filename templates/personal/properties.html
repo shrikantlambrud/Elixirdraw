@@ -1,80 +1,276 @@
 {% extends "personal/base.html" %}
+{% block title %}All Properties — Personal Panel{% endblock %}
 {% block content %}
 
 <style>
-.section-title{
-    font-weight:600;
-    margin-bottom:20px;
-}
 
-.custom-card{
-    border:none;
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    transition:0.3s;
-}
+  .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.custom-card:hover{
-    transform:translateY(-5px);
-}
+  .page-title-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    flex-shrink: 0;
+  }
 
-.custom-img{
-    height:200px;
-    object-fit:cover;
-}
+  .page-title-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
-.card-body h5{
-    font-size:15px;
-    font-weight:600;
-}
+  /* ── CARD ── */
+  .custom-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.07);
+    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-.info-text{
-    font-size:13px;
-    color:#777;
-}
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(14,165,233,0.15);
+    border-color: #bae6fd;
+  }
 
-.price{
-    color:#28a745;
-    font-weight:600;
-}
+  /* ── IMAGE ── */
+  .img-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .custom-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+
+  .custom-card:hover .custom-img { transform: scale(1.04); }
+
+  /* ── CARD BODY ── */
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .card-body h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  /* ── META ── */
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 5px;
+  }
+
+  .info-row svg {
+    width: 14px;
+    height: 14px;
+    stroke: #94a3b8;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* ── PRICE ── */
+  .price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0284c7;
+    letter-spacing: -0.3px;
+    margin: 10px 0 12px;
+  }
+
+  .price span {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+
+  /* ── DIVIDER ── */
+  .card-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 0 0 12px;
+  }
+
+  /* ── VIEW BUTTON ── */
+  .btn-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid #bae6fd;
+    color: #0284c7;
+    background: #f0f9ff;
+    font-family: inherit;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    margin-top: auto;
+  }
+
+  .btn-view svg {
+    width: 14px;
+    height: 14px;
+    stroke: #0284c7;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .btn-view:hover {
+    background: #e0f2fe;
+    border-color: #0ea5e9;
+    box-shadow: 0 2px 10px rgba(14,165,233,0.12);
+    color: #0284c7;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 64px 20px;
+  }
+
+  .empty-icon {
+    width: 72px;
+    height: 72px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .empty-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke: #0ea5e9;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .empty-state h5 { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .empty-state p  { font-size: 14px; color: #64748b; margin: 0; }
+
+  @media (max-width: 768px) {
+    .custom-img { height: 170px; }
+  }
+
 </style>
 
-<div class="container">
+<div class="container mt-4 mb-5">
 
-<h4 class="section-title">🏠 All Properties</h4>
+  <h4 class="page-title">
+    <div class="page-title-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    All Properties
+  </h4>
 
-{% if properties %}
-<div class="row g-3">
-{% for p in properties %}
-<div class="col-lg-3 col-md-4 col-sm-6">
+  {% if properties %}
 
-<div class="custom-card h-100">
+  <div class="row g-3">
+    {% for p in properties %}
 
-<img src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}" class="w-100 custom-img">
+    <div class="col-lg-3 col-md-4 col-sm-6">
+      <div class="custom-card">
 
-<div class="card-body">
+        <div class="img-wrap">
+          <img
+            src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}"
+            class="custom-img"
+            alt="{{ p.title }}">
+        </div>
 
-<h5>{{ p.title }}</h5>
-<p class="info-text">🏢 {{ p.business_name }}</p>
-<p class="info-text">📍 {{ p.location }}</p>
+        <div class="card-body">
 
-{% if p.deposit %}
-<div class="price">₹{{ p.deposit }}</div>
-{% endif %}
+          <h5>{{ p.title }}</h5>
 
-<a href="#" class="btn btn-outline-primary btn-sm mt-2">View</a>
+          <div class="info-row">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            {{ p.business_name }}
+          </div>
 
-</div>
-</div>
+          <div class="info-row">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ p.location }}
+          </div>
 
-</div>
-{% endfor %}
-</div>
-{% else %}
-<p>No properties found.</p>
-{% endif %}
+          {% if p.deposit %}
+          <div class="price">₹{{ p.deposit }} <span>deposit</span></div>
+          {% endif %}
+
+          <hr class="card-divider">
+
+          <a href="#" class="btn-view">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View Details
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  {% else %}
+
+  <div class="empty-state">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h5>No Properties Found</h5>
+    <p>There are no properties listed at the moment.</p>
+  </div>
+
+  {% endif %}
 
 </div>
 

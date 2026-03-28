@@ -1,98 +1,366 @@
 {% extends "admin/base.html" %}
+{% block title %}Business Approval — Admin Panel{% endblock %}
+{% block page_title %}Business Approval{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
+<style>
 
-<h3>🏢 Pending Business Approval</h3>
+  .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-{% if users %}
+  .page-title-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
+    flex-shrink: 0;
+  }
 
-<table class="table table-bordered mt-3">
-<thead>
-<tr>
-<th>ID</th>
-<th>Business</th>
-<th>Owner</th>
-<th>Email</th>
-<th>Phone</th>
-<th>Action</th>
-</tr>
-</thead>
+  .page-title-icon svg {
+    width: 20px; height: 20px;
+    stroke: #fff; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
 
-<tbody>
+  /* ── TABLE CARD ── */
+  .table-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e0f2fe;
+    box-shadow: 0 2px 16px rgba(14,165,233,0.07);
+    overflow: hidden;
+  }
 
-{% for u in users %}
-<tr>
+  .table-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #7dd3fc);
+  }
 
-<td>{{ u.id }}</td>
-<td>{{ u.business_name }}</td>
-<td>{{ u.name }}</td>
-<td>{{ u.email }}</td>
-<td>{{ u.phone }}</td>
+  /* ── TABLE ── */
+  .table { margin: 0; width: 100%; border-collapse: collapse; }
 
-<td>
+  .table thead tr {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
 
-<button class="btn btn-success approve-btn" data-id="{{ u.id }}">
-Approve
-</button>
+  .table thead th {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 13px 18px;
+    border: none;
+    white-space: nowrap;
+  }
 
-<button class="btn btn-danger reject-btn" data-id="{{ u.id }}">
-Reject
-</button>
+  .table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+  }
 
-</td>
+  .table tbody tr:last-child { border-bottom: none; }
+  .table tbody tr:hover { background: #f8fafc; }
 
-</tr>
-{% endfor %}
+  .table tbody td {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: #334155;
+    border: none;
+    vertical-align: middle;
+  }
 
-</tbody>
-</table>
+  /* id chip */
+  .id-chip {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
 
-{% else %}
-<p>No pending users</p>
-{% endif %}
+  /* business name with avatar */
+  .biz-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: #0f172a;
+  }
 
+  .biz-avatar {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* contact info */
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .contact-row svg {
+    width: 13px; height: 13px;
+    stroke: #94a3b8; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* action buttons */
+  .action-btns {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn-approve, .btn-reject {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-approve svg, .btn-reject svg {
+    width: 13px; height: 13px;
+    stroke: #fff; fill: none;
+    stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .btn-approve {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(34,197,94,0.22);
+  }
+
+  .btn-approve:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(34,197,94,0.32);
+  }
+
+  .btn-reject {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(220,38,38,0.20);
+  }
+
+  .btn-reject:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(220,38,38,0.30);
+  }
+
+  .btn-approve:active,
+  .btn-reject:active { transform: scale(0.97); }
+
+  /* row removing animation */
+  .row-removing {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-row td { text-align: center; padding: 56px 20px; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .empty-icon {
+    width: 60px; height: 60px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .empty-icon svg {
+    width: 28px; height: 28px;
+    stroke: #0ea5e9; fill: none;
+    stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .empty-state p { font-size: 14px; color: #64748b; margin: 0; }
+
+  .table-scroll { overflow-x: auto; }
+
+</style>
+
+<h3 class="page-title">
+  <div class="page-title-icon">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  Pending Business Approval
+</h3>
+
+<div class="table-card">
+  <div class="table-scroll">
+    <table class="table" id="approvalTable">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Business</th>
+          <th>Owner</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="approvalBody">
+
+        {% if users %}
+          {% for u in users %}
+          <tr id="row-{{ u.id }}">
+
+            <td><span class="id-chip">#{{ u.id }}</span></td>
+
+            <td>
+              <div class="biz-cell">
+                <div class="biz-avatar">{{ u.business_name[:1]|upper }}</div>
+                {{ u.business_name }}
+              </div>
+            </td>
+
+            <td>{{ u.name }}</td>
+
+            <td>
+              <div class="contact-row">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                {{ u.email }}
+              </div>
+            </td>
+
+            <td>
+              <div class="contact-row">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                {{ u.phone }}
+              </div>
+            </td>
+
+            <td>
+              <div class="action-btns">
+
+                <button class="btn-approve approve-btn" data-id="{{ u.id }}">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Approve
+                </button>
+
+                <button class="btn-reject reject-btn" data-id="{{ u.id }}">
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Reject
+                </button>
+
+              </div>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        {% else %}
+        <tr class="empty-row">
+          <td colspan="6">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </div>
+              <p>No pending business approvals.</p>
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+
+      </tbody>
+    </table>
+  </div>
 </div>
 
-<!-- AJAX -->
 <script>
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
 
-    // APPROVE
-    document.querySelectorAll(".approve-btn").forEach(btn => {
-        btn.addEventListener("click", function(){
+  function removeRow(userId) {
+    const row = document.getElementById('row-' + userId);
+    if (!row) return;
+    row.classList.add('row-removing');
+    setTimeout(() => {
+      row.remove();
+      // show empty state if no rows left
+      const body = document.getElementById('approvalBody');
+      if (body && body.querySelectorAll('tr').length === 0) {
+        body.innerHTML = `
+          <tr class="empty-row">
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  </svg>
+                </div>
+                <p>No pending business approvals.</p>
+              </div>
+            </td>
+          </tr>`;
+      }
+    }, 300);
+  }
 
-            let userId = this.dataset.id;
-            let row = this.closest("tr");
-
-            fetch(`/approve-business/${userId}`)
-            .then(res => res.text())
-            .then(data => {
-                if(data.trim() === "success"){
-                    row.remove(); // 🔥 remove row
-                }
-            });
-
-        });
+  // APPROVE
+  document.querySelectorAll(".approve-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const userId = this.dataset.id;
+      fetch(`/approve-business/${userId}`)
+        .then(res => res.text())
+        .then(data => { if (data.trim() === "success") removeRow(userId); });
     });
+  });
 
-    // REJECT
-    document.querySelectorAll(".reject-btn").forEach(btn => {
-        btn.addEventListener("click", function(){
-
-            let userId = this.dataset.id;
-            let row = this.closest("tr");
-
-            fetch(`/reject-business/${userId}`)
-            .then(res => res.text())
-            .then(data => {
-                if(data.trim() === "success"){
-                    row.remove(); // 🔥 remove row
-                }
-            });
-
-        });
+  // REJECT
+  document.querySelectorAll(".reject-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const userId = this.dataset.id;
+      fetch(`/reject-business/${userId}`)
+        .then(res => res.text())
+        .then(data => { if (data.trim() === "success") removeRow(userId); });
     });
+  });
 
 });
 </script>
