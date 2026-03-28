@@ -1,11 +1,18 @@
-from flask import Flask, render_template, request, redirect, session
-import mysql.connector
-from flask_mail import Mail, Message
-import random
-from flask import render_template, request, redirect, session, url_for
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
+from flask import (
+    Flask, render_template, request,
+    redirect, session, url_for, flash
+)
 
+from flask_mail import Mail, Message
+
+import mysql.connector
+import random
+import os
+
+from datetime import datetime, timedelta
+
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = "secret123"
 
@@ -56,30 +63,59 @@ def register():
         # 🔐 HASH PASSWORD
         password = generate_password_hash(request.form['password'])
 
+        # 🔢 OTP GENERATE
         otp = str(random.randint(100000, 999999))
 
+        # ⏱ OTP EXPIRY (10 minutes)
+        otp_expiry = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+
+        # 💾 STORE TEMP DATA IN SESSION
         session['temp_user'] = {
             "name": name,
             "email": email,
             "phone": phone,
             "address": address,
             "password": password,
-            "otp": otp
+            "otp": otp,
+            "otp_expiry": otp_expiry
         }
 
+        # 📩 SEND EMAIL
         msg = Message(
-            "Your OTP Verification",
+            "Your OTP Verification - Personal Registration",
             sender=app.config['MAIL_USERNAME'],
             recipients=[email]
         )
-        msg.body = f"Your OTP is {otp}"
+
+        msg.body = f"""
+Hello {name},
+
+Thank you for registering with us.
+
+To complete your registration, please use the OTP below:
+
+----------------------------------------------------
+Your OTP is: {otp}
+----------------------------------------------------
+
+⏳ This OTP is valid for 5 minutes only.
+
+Please do not share this OTP with anyone.
+
+If you did not request this registration, please ignore this email.
+
+Best regards,  
+Support Team
+ElixirDraw
+"""
 
         mail.send(msg)
+
+        flash("OTP sent to your email successfully!", "success")
 
         return redirect(url_for("verify_otp"))
 
     return render_template("register.html")
-
 @app.route("/verify-otp", methods=["GET", "POST"])
 def verify_otp():
 
@@ -124,7 +160,7 @@ def verify_otp():
 
     return render_template("verify_otp.html")
 # BUSINESS REGISTER
-@app.route("/business_register", methods=["GET","POST"])
+@app.route("/business_register", methods=["GET", "POST"])
 def business_register():
 
     if request.method == "POST":
@@ -138,15 +174,25 @@ def business_register():
         # 🔐 HASH PASSWORD
         password = generate_password_hash(request.form["password"])
 
-        file = request.files["document"]
+        # 📁 FILE UPLOAD SAFE HANDLING
+        file = request.files.get("document")
         filename = ""
 
         if file and file.filename != "":
-            filename = file.filename
-            file.save("static/uploads/" + filename)
+            filename = secure_filename(file.filename)
 
+            upload_path = os.path.join("static", "uploads")
+            os.makedirs(upload_path, exist_ok=True)
+
+            file.save(os.path.join(upload_path, filename))
+
+        # 🔢 OTP GENERATE
         otp = str(random.randint(100000, 999999))
 
+        # ⏱ OPTIONAL: OTP EXPIRY
+        otp_expiry = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+
+        # 💾 SESSION STORE
         session['temp_business'] = {
             "business_name": business_name,
             "email": email,
@@ -155,22 +201,43 @@ def business_register():
             "udyam_no": udyam_no,
             "password": password,
             "document": filename,
-            "otp": otp
+            "otp": otp,
+            "otp_expiry": otp_expiry
         }
 
+        # 📩 EMAIL OTP (PROFESSIONAL FORMAT)
         msg = Message(
-            "Business Registration OTP",
+            "Business Registration - OTP Verification",
             sender=app.config['MAIL_USERNAME'],
             recipients=[email]
         )
-        msg.body = f"Your OTP is {otp}"
+
+        msg.body = f"""
+Hello {business_name},
+
+Thank you for registering your business with us.
+
+To complete your registration, please use the OTP below:
+
+----------------------------------------------------
+Your OTP is: {otp}
+----------------------------------------------------
+
+⏳ This OTP is valid for 10 minutes only.
+
+Please do not share this OTP with anyone for security reasons.
+
+If you did not request this registration, you can safely ignore this email.
+
+Best regards,  
+Support Team
+"""
 
         mail.send(msg)
 
         return redirect("/verify-business-otp")
 
     return render_template("business_register.html")
-
 @app.route("/verify-business-otp", methods=["GET","POST"])
 def verify_business_otp():
 
@@ -283,7 +350,26 @@ def forgot_password():
         msg = Message("Password Reset OTP",
                       sender=app.config['MAIL_USERNAME'],
                       recipients=[email])
-        msg.body = f"Your OTP is {otp}"
+        msg.body = f"""
+Hello,
+
+We received a request to reset your account password.
+
+To proceed with the password reset, please use the One-Time Password (OTP) below:
+
+----------------------------------------------------
+Your OTP is: {otp}
+----------------------------------------------------
+
+⏳ This OTP is valid for 10 minutes only.
+
+If you did not request a password reset, please ignore this email. Your account is safe and no changes will be made.
+
+For security reasons, never share this OTP with anyone.
+
+Thank you,  
+Support Team
+"""
         mail.send(msg)
 
         return redirect("/verify-reset-otp")
@@ -403,10 +489,10 @@ def wallet_requests():
     cur = db.cursor(dictionary=True)
 
     cur.execute("""
-    SELECT wallet_requests.*, users.business_name
-    FROM wallet_requests
-    LEFT JOIN users ON wallet_requests.user_id = users.id
-    WHERE wallet_requests.status='pending'
+        SELECT wr.*, u.name, u.business_name, u.role
+        FROM wallet_requests wr
+        LEFT JOIN users u ON wr.user_id = u.id
+        ORDER BY wr.id DESC
     """)
 
     requests = cur.fetchall()
@@ -419,20 +505,23 @@ def approve_wallet(id):
     db = get_db()
     cur = db.cursor(dictionary=True)
 
-    cur.execute("SELECT * FROM wallet_requests WHERE id=%s",(id,))
+    cur.execute("SELECT * FROM wallet_requests WHERE id=%s", (id,))
     req = cur.fetchone()
 
-    cur.execute("""
-    UPDATE users
-    SET wallet_balance = wallet_balance + %s
-    WHERE id=%s
-    """,(req["amount"],req["user_id"]))
+    if not req:
+        return "Request not found"
 
     cur.execute("""
-    UPDATE wallet_requests
-    SET status='approved'
-    WHERE id=%s
-    """,(id,))
+        UPDATE users
+        SET wallet_balance = wallet_balance + %s
+        WHERE id=%s
+    """, (req["amount"], req["user_id"]))
+
+    cur.execute("""
+        UPDATE wallet_requests
+        SET status='approved'
+        WHERE id=%s
+    """, (id,))
 
     db.commit()
 
@@ -593,7 +682,6 @@ def add_property():
     return render_template("business/add_property.html")
 
 # ADD MATERIAL
-# ADD MATERIAL
 @app.route("/business/add_material", methods=["GET","POST"])
 def add_material():
 
@@ -703,16 +791,24 @@ def personal_dashboard():
     db = get_db()
     cur = db.cursor(dictionary=True)
 
+    # 🏠 PROPERTIES (IMPORTANT FIX: phone mapped as user_phone)
     cur.execute("""
-        SELECT properties.*, users.business_name, users.phone
+        SELECT 
+            properties.*,
+            users.business_name,
+            users.phone AS user_phone
         FROM properties
         LEFT JOIN users ON properties.user_id = users.id
         ORDER BY properties.id DESC
     """)
     properties = cur.fetchall()
 
+    # 🧱 MATERIALS
     cur.execute("""
-        SELECT materials.*, users.business_name, users.phone
+        SELECT 
+            materials.*,
+            users.business_name,
+            users.phone AS user_phone
         FROM materials
         LEFT JOIN users ON materials.user_id = users.id
         ORDER BY materials.id DESC
@@ -724,6 +820,131 @@ def personal_dashboard():
         properties=properties,
         materials=materials
     )
+
+
+@app.route("/personal/add_rent", methods=["GET", "POST"])
+def personal_add_rent():
+
+    if not session.get("user_id") or session.get("role") != "personal":
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        title = request.form.get("title")
+        property_type = request.form.get("flat_type")   # room / flat
+        price = request.form.get("price")
+        city = request.form.get("city")
+        area = request.form.get("area")
+        description = request.form.get("description")
+
+        location = f"{city} - {area}"
+
+        # 📸 IMAGE UPLOAD
+        file = request.files.get("image1")
+        filename = None
+
+        if file and file.filename:
+            filename = file.filename
+            file.save("static/uploads/" + filename)
+
+        db = get_db()
+        cur = db.cursor(dictionary=True)
+
+        # 💰 WALLET CHECK
+        cur.execute(
+            "SELECT wallet_balance FROM users WHERE id=%s",
+            (session["user_id"],)
+        )
+        wallet_row = cur.fetchone()
+        wallet = wallet_row["wallet_balance"] if wallet_row else 0
+
+        if wallet < 10:
+            flash("❌ Insufficient wallet balance")
+            return redirect("/personal/wallet")
+
+        # 💸 WALLET DEDUCT
+        cur.execute("""
+            UPDATE users
+            SET wallet_balance = wallet_balance - 10
+            WHERE id=%s
+        """, (session["user_id"],))
+
+        # 🏠 INSERT PROPERTY (NO contact_number needed)
+        cur.execute("""
+            INSERT INTO properties
+            (user_id, title, price, location, property_type, image1, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
+            session["user_id"],
+            title,
+            price,
+            location,
+            property_type,
+            filename,
+            description
+        ))
+
+        db.commit()
+
+        flash("✅ Rent added successfully!")
+        return redirect("/personal/dashboard")
+
+    return render_template("personal/add_rent.html")
+@app.route("/personal/wallet")
+def personal_wallet():
+
+    if session.get("role") != "personal":
+        return redirect("/login")
+
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    # wallet balance
+    cur.execute("SELECT wallet_balance FROM users WHERE id=%s", (session["user_id"],))
+    wallet = cur.fetchone()
+
+    # request history
+    cur.execute("""
+        SELECT * FROM wallet_requests
+        WHERE user_id=%s
+        ORDER BY id DESC
+    """, (session["user_id"],))
+
+    requests = cur.fetchall()
+
+    return render_template(
+        "personal/wallet.html",
+        wallet=wallet,
+        requests=requests
+    )
+@app.route("/personal/add_wallet", methods=["POST"])
+def personal_add_wallet():
+
+    if session.get("role") != "personal":
+        return redirect("/login")
+
+    amount = request.form["amount"]
+    utr = request.form["utr"]
+
+    file = request.files["screenshot"]
+    filename = ""
+
+    if file and file.filename != "":
+        filename = file.filename
+        file.save("static/uploads/" + filename)
+
+    db = get_db()
+    cur = db.cursor()
+
+    cur.execute("""
+        INSERT INTO wallet_requests
+        (user_id, amount, utr_number, payment_screenshot)
+        VALUES (%s,%s,%s,%s)
+    """, (session["user_id"], amount, utr, filename))
+
+    db.commit()
+
+    return redirect("/personal/wallet")
 # PERSONAL: All Properties Page
 @app.route("/personal/properties")
 def personal_properties():  # Unique function name
@@ -760,6 +981,58 @@ def personal_materials():  # Unique function name
     materials = cur.fetchall()
 
     return render_template("personal/materials.html", materials=materials)
+@app.route("/personal/profile")
+def personal_profile():
+
+    # 🔐 Auth Check
+    if not session.get("user_id") or session.get("role") != "personal":
+        return redirect("/login")
+
+    db = get_db()
+    cur = db.cursor(dictionary=True)
+
+    try:
+        # 👤 USER INFO
+        cur.execute("""
+            SELECT id, name, email, phone, address, wallet_balance
+            FROM users
+            WHERE id = %s
+        """, (session["user_id"],))
+        user = cur.fetchone()
+
+        # ❌ अगर user नाही सापडला
+        if not user:
+            flash("User not found", "danger")
+            return redirect("/login")
+
+        # 🏠 PROPERTY HISTORY
+        cur.execute("""
+            SELECT id, title, price, location, flat_type, created_at, image1
+            FROM properties
+            WHERE user_id = %s
+            ORDER BY id DESC
+        """, (session["user_id"],))
+        properties = cur.fetchall()
+
+        # 🧱 MATERIAL HISTORY
+        cur.execute("""
+    SELECT id, title, price, quantity
+    FROM materials
+    WHERE user_id = %s
+    ORDER BY id DESC
+""", (session["user_id"],))
+        materials = cur.fetchall()
+
+    finally:
+        cur.close()
+        db.close()
+
+    return render_template(
+        "personal/profile.html",
+        user=user,
+        properties=properties,
+        materials=materials
+    )
 
 @app.route("/logout")
 def logout():
