@@ -1,0 +1,64 @@
+{% extends "business/base.html" if session.get('role') == 'business' else "personal/base.html" %}
+{% block title %}Services — ElixirDraw{% endblock %}
+
+{% block content %}
+<style>
+.svc-cat-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; margin-bottom:16px; }
+.svc-cat-chip { flex-shrink:0; padding:8px 16px; border-radius:20px; font-size:12.5px; font-weight:700; text-decoration:none; background:#F1F5F9; color:var(--text-muted); white-space:nowrap; }
+.svc-cat-chip.active { background:var(--primary); color:#fff; }
+
+.svc-card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:12px; box-shadow:var(--card-shadow); display:flex; gap:12px; }
+.svc-avatar { width:52px; height:52px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#EEF2FF,#C7D2FE); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.svc-name { font-size:14.5px; font-weight:700; color:var(--text-dark); }
+.svc-cat-tag { display:inline-block; font-size:11px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:2px 9px; border-radius:8px; margin-top:3px; }
+.svc-exp { font-size:11.5px; color:var(--text-muted); margin-top:4px; }
+.svc-about { font-size:12px; color:var(--text-mid); margin-top:6px; line-height:1.4; }
+.svc-call-btn { margin-top:10px; display:inline-flex; align-items:center; gap:6px; background:#DCFCE7; color:#16A34A; padding:8px 16px; border-radius:9px; font-size:12.5px; font-weight:700; text-decoration:none; }
+.svc-verified { font-size:10px; color:#16A34A; font-weight:700; display:flex; align-items:center; gap:3px; margin-top:2px; }
+</style>
+
+<div style="margin-bottom:14px;">
+  <div style="font-size:20px;font-weight:800;color:var(--text-dark);">🧰 Services</div>
+  <div style="font-size:13px;color:var(--text-muted);">Find verified professionals near you</div>
+</div>
+
+<div class="svc-cat-scroll">
+  <a href="/services" class="svc-cat-chip {% if not selected_category %}active{% endif %}">All</a>
+  {% for c in categories %}
+  <a href="/services?category={{ c|urlencode }}" class="svc-cat-chip {% if selected_category == c %}active{% endif %}">{{ c }}</a>
+  {% endfor %}
+</div>
+
+{% if providers %}
+{% for p in providers %}
+<div class="svc-card">
+  <div class="svc-avatar">
+    {% if p.profile_pic %}
+      <img src="{{ url_for('static', filename='uploads/' ~ p.profile_pic) }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+    {% else %}🧑‍🔧{% endif %}
+  </div>
+  <div style="flex:1;min-width:0;">
+    <div class="svc-name">{{ p.business_name or p.user_name or 'Service Provider' }}</div>
+    <div class="svc-verified"><i class="bi bi-patch-check-fill"></i> Verified Provider</div>
+    <span class="svc-cat-tag">{{ p.category }}</span>
+    <div class="svc-exp">{{ p.experience }} experience</div>
+    {% if p.about %}<div class="svc-about">{{ p.about }}</div>{% endif %}
+    {% if p.phone %}
+    <a href="tel:{{ p.phone }}" class="svc-call-btn"><i class="bi bi-telephone-fill"></i> Call Now</a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div style="text-align:center;padding:60px 20px;">
+  <div style="font-size:56px;margin-bottom:16px;">🧰</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">
+    {% if selected_category %}No {{ selected_category }} providers yet{% else %}No verified service providers yet{% endif %}
+  </div>
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Are you a professional? Register and get discovered by users.</div>
+  <a href="/register-service-provider" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;">
+    <i class="bi bi-person-badge-fill"></i> Register as Service Provider
+  </a>
+</div>
+{% endif %}
+{% endblock %}

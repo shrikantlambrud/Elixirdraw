@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+{% block title %}Service Providers{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <h4 class="fw-bold mb-4"><i class="bi bi-person-badge"></i> Service Provider Applications</h4>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else category }} alert-dismissible fade show">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if applications %}
+  {% for sp in applications %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <h6 class="fw-bold mb-0">{{ sp.business_name or sp.user_name or 'Unknown User' }}</h6>
+            {% if sp.status == 'pending' %}
+              <span class="badge bg-warning text-dark">⏳ Pending</span>
+            {% elif sp.status == 'approved' %}
+              <span class="badge bg-success">✅ Approved</span>
+            {% else %}
+              <span class="badge bg-danger">❌ Rejected</span>
+            {% endif %}
+          </div>
+
+          <div class="small text-muted mb-2">
+            <i class="bi bi-envelope"></i> {{ sp.email or '—' }} &nbsp;
+            <i class="bi bi-telephone"></i> {{ sp.phone or '—' }}
+          </div>
+
+          <table class="table table-sm mb-2">
+            <tr>
+              <th style="width:160px;">Category</th>
+              <td>{{ sp.category }}</td>
+            </tr>
+            <tr>
+              <th>Experience</th>
+              <td>{{ sp.experience }}</td>
+            </tr>
+            <tr>
+              <th>About</th>
+              <td>{{ sp.about }}</td>
+            </tr>
+          </table>
+
+          <div class="mb-2">
+            <strong class="small">🪪 Verification Documents</strong><br>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              {% if sp.id_doc1 %}
+              <a href="{{ url_for('static', filename='uploads/' ~ sp.id_doc1) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-file-earmark-text"></i> {{ sp.id_doc1_type or 'Govt ID 1' }}
+              </a>
+              {% endif %}
+              {% if sp.id_doc2 %}
+              <a href="{{ url_for('static', filename='uploads/' ~ sp.id_doc2) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-file-earmark-text"></i> {{ sp.id_doc2_type or 'Govt ID 2' }}
+              </a>
+              {% endif %}
+              {% if sp.professional_doc %}
+              <a href="{{ url_for('static', filename='uploads/' ~ sp.professional_doc) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-award"></i> {{ sp.professional_doc_type or 'Professional Proof' }}
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="small text-muted">Applied: {{ sp.created_at }}</div>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column gap-2 justify-content-center">
+          {% if sp.status == 'pending' %}
+          <form method="POST" action="/admin/service_providers/{{ sp.id }}/approve">
+            <button class="btn btn-success btn-sm w-100"><i class="bi bi-check-circle"></i> Approve</button>
+          </form>
+          <form method="POST" action="/admin/service_providers/{{ sp.id }}/reject">
+            <button class="btn btn-outline-danger btn-sm w-100"><i class="bi bi-x-circle"></i> Reject</button>
+          </form>
+          {% else %}
+          <div class="text-muted small text-center mb-1">Status: {{ sp.status|capitalize }}</div>
+          {% endif %}
+          <form method="POST" action="/admin/service_providers/{{ sp.id }}/delete" onsubmit="return confirm('Permanently delete this application?');">
+            <button class="btn btn-outline-secondary btn-sm w-100"><i class="bi bi-trash"></i> Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-inbox" style="font-size:40px;"></i>
+    <p class="mt-2">No Service Provider applications yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

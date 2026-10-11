@@ -1,0 +1,139 @@
+{% extends "personal/base.html" %}
+{% block title %}Offers — ElixirDraw{% endblock %}
+
+{% block content %}
+<style>
+.offer-card { background:#fff; border-radius:16px; overflow:hidden; border:1px solid var(--border); box-shadow:var(--card-shadow); margin-bottom:16px; }
+.offer-img-wrap { position:relative; }
+.offer-img { width:100%; height:180px; object-fit:cover; display:block; cursor:pointer; }
+.offer-label { position:absolute; top:10px; left:10px; background:var(--primary); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; }
+.offer-body { padding:14px; }
+.offer-title { font-size:15px; font-weight:700; color:var(--text-dark); margin-bottom:4px; }
+.offer-meta { font-size:12px; color:var(--text-muted); margin-bottom:8px; }
+
+.countdown { display:inline-block; padding:5px 11px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px; }
+.cd-safe { background:#DCFCE7; color:#166534; }
+.cd-medium { background:#FEF9C3; color:#92400E; }
+.cd-urgent { background:#FEE2E2; color:#991B1B; animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+
+.progress-bar-wrap { background:#E5E7EB; border-radius:20px; height:7px; overflow:hidden; margin:8px 0; }
+.progress-bar-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--green),var(--green-dark)); transition:width 0.5s; }
+
+.join-count { font-size:12px; color:var(--text-muted); margin-bottom:12px; }
+
+.btn-join { width:100%; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#fff; font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+.btn-join:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(34,197,94,0.35); }
+.btn-joined { background:#CBD5E1; color:#334155; cursor:not-allowed; }
+.btn-joined:hover { transform:none; box-shadow:none; }
+
+.winner-box { background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-top:10px; }
+.winner-title { font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+.winner-row { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-dark); }
+.winner-avatar { width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-mid)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-icon { font-size:56px; margin-bottom:16px; }
+</style>
+
+<div style="margin-bottom:18px;">
+  <div style="font-size:20px;font-weight:800;color:var(--text-dark);margin-bottom:4px;">🎁 Active Offers</div>
+  <div style="font-size:13px;color:var(--text-muted);">Join offers and win exciting rewards</div>
+  {% if not plan_active %}
+  <div style="background:#EEF2FF;color:#4338CA;font-size:12px;font-weight:500;padding:9px 13px;border-radius:10px;margin-top:10px;display:flex;align-items:center;gap:7px;">
+    <i class="bi bi-info-circle-fill"></i> You need a valid Recharge Plan to join the offer. <a href="/personal/wallet" style="color:#4338CA;font-weight:700;">Get a plan →</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if offers %}
+<div class="row g-3">
+{% for offer in offers %}
+<div class="col-md-6">
+<div class="offer-card">
+  <div class="offer-img-wrap">
+    <img src="{{ url_for('static', filename='uploads/' ~ offer.image) if offer.image else 'https://via.placeholder.com/400x200/5B4FE9/white?text=Offer' }}" class="offer-img" onclick="openLightbox(this.src)">
+    <span class="offer-label">🎁 Offer</span>
+  </div>
+  <div class="offer-body">
+    <div class="offer-title">{{ offer.title }}</div>
+    <div class="offer-meta">Expiry: {{ offer.expiry }}</div>
+    <div class="countdown {{ 'cd-safe' if (offer.days_left|default(0)) > 7 else 'cd-medium' if (offer.days_left|default(0)) > 2 else 'cd-urgent' }}" data-expiry="{{ offer.expiry }}">
+      ⏳ Loading...
+    </div>
+    <div class="join-count">{{ offer.total_enrolled }} joined · {{ offer.spots_left }} spots left</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" style="width:{{ offer.progress }}%"></div>
+    </div>
+
+    {% if offer.id in enrolled %}
+    <button class="btn-join btn-joined"><i class="bi bi-check-circle-fill"></i> Joined</button>
+    {% elif active_enrollment %}
+    <button class="btn-join btn-joined" disabled title="You're already in {{ active_enrollment.title }}">
+      <i class="bi bi-lock-fill"></i> Already in another offer
+    </button>
+    {% elif not plan_active %}
+    <a href="/personal/wallet" class="btn-join" style="text-decoration:none;background:linear-gradient(135deg,#F59E0B,#D97706);">
+      <i class="bi bi-lock-fill"></i> Need active plan to join
+    </a>
+    {% else %}
+    <form method="POST" action="/offer/enroll/{{ offer.id }}">
+      <button type="submit" class="btn-join"><i class="bi bi-trophy-fill"></i> Join Offer</button>
+    </form>
+    {% endif %}
+
+    {% if offer.winner_name %}
+    <div class="winner-box">
+      <div class="winner-title">🏆 Winner</div>
+      <div class="winner-row">
+        <div class="winner-avatar">{{ offer.winner_name[0]|upper }}</div>
+        <span>{{ offer.winner_name }}</span>
+        <span style="color:var(--text-muted);">· {{ offer.winner_city if offer.winner_city else '' }}</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">🎁</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">No Active Offers</div>
+  <div style="font-size:13px;color:var(--text-muted);">Check back later for exciting offers and rewards.</div>
+</div>
+{% endif %}
+
+<!-- Lightbox -->
+<div id="lightbox" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);display:none;align-items:center;justify-content:center;z-index:9999;" onclick="closeLightbox()">
+  <img id="lightboxImg" style="max-width:92%;max-height:88%;border-radius:12px;">
+</div>
+
+<script>
+// Countdown
+document.querySelectorAll('.countdown[data-expiry]').forEach(el => {
+  function tick() {
+    const expiry = new Date(el.dataset.expiry);
+    const now = new Date();
+    const diff = expiry - now;
+    if (diff <= 0) { el.textContent = '⏰ Expired'; return; }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    el.textContent = d > 0 ? `⏳ ${d}d ${h}h left` : `⏳ ${h}h ${m}m left`;
+  }
+  tick();
+  setInterval(tick, 60000);
+});
+
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+</script>
+{% endblock %}

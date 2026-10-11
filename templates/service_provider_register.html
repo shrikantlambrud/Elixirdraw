@@ -1,0 +1,192 @@
+{% extends "business/base.html" if session.get('role') == 'business' else "personal/base.html" %}
+{% block title %}Register as Service Provider — ElixirDraw{% endblock %}
+
+{% block content %}
+<style>
+.sp-card { background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow:var(--card-shadow); overflow:hidden; margin-bottom:16px; }
+.sp-card-header { padding:14px 16px; border-bottom:1px solid var(--border); font-size:14px; font-weight:700; color:var(--text-dark); display:flex; align-items:center; gap:8px; }
+.sp-card-body { padding:16px; }
+
+.sp-readonly-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid #F8FAFC; }
+.sp-readonly-row:last-child { border-bottom:none; }
+.sp-ro-icon { width:34px; height:34px; border-radius:9px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:15px; flex-shrink:0; }
+.sp-ro-label { font-size:11px; color:var(--text-muted); font-weight:600; }
+.sp-ro-value { font-size:13.5px; font-weight:600; color:var(--text-dark); }
+
+.sp-note { background:#FFF7ED; color:#9A5B13; font-size:12px; padding:10px 14px; border-radius:10px; margin-bottom:14px; display:flex; gap:8px; align-items:flex-start; }
+
+.sp-select, .sp-textarea, .sp-input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; font-family:var(--font); color:var(--text-dark); outline:none; margin-bottom:12px; background:#fff; }
+.sp-select:focus, .sp-textarea:focus, .sp-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(91,79,233,0.1); }
+.sp-textarea { min-height:90px; resize:vertical; }
+
+.sp-file-zone { border:2px dashed #C7D2FE; border-radius:12px; padding:16px; text-align:center; background:#FAFBFF; cursor:pointer; position:relative; margin-bottom:12px; }
+.sp-file-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.sp-file-label { font-size:12.5px; font-weight:600; color:var(--primary); }
+.sp-file-hint { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+.sp-submit-btn { width:100%; padding:13px; border-radius:12px; border:none; background:var(--primary); color:#fff; font-size:15px; font-weight:700; font-family:var(--font); cursor:pointer; }
+.sp-submit-btn:hover { background:var(--primary-dark); }
+
+.sp-status-pill { padding:5px 14px; border-radius:20px; font-size:12.5px; font-weight:700; display:inline-block; }
+.sp-status-pending { background:#FEF9C3; color:#92400E; }
+.sp-status-approved { background:#DCFCE7; color:#16A34A; }
+.sp-status-rejected { background:#FEE2E2; color:#991B1B; }
+</style>
+
+<div style="margin-bottom:16px;">
+  <div style="font-size:20px;font-weight:800;color:var(--text-dark);">🧰 Register as Service Provider</div>
+  <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">Offer your professional services to ElixirDraw users.</div>
+</div>
+
+{% if existing %}
+<div class="sp-card">
+  <div class="sp-card-body" style="text-align:center;">
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Your application status</div>
+    <span class="sp-status-pill sp-status-{{ existing.status }}">
+      {% if existing.status == 'pending' %}⏳ Under Review
+      {% elif existing.status == 'approved' %}✅ Approved
+      {% else %}❌ {{ existing.status|capitalize }}{% endif %}
+    </span>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+      Category: <strong>{{ existing.category }}</strong> · Experience: <strong>{{ existing.experience }}</strong>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Profile Information (Auto-Filled) -->
+<div class="sp-card">
+  <div class="sp-card-header"><i class="bi bi-person-badge-fill"></i> Profile Information (Auto-Filled)</div>
+  <div class="sp-card-body">
+    <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:10px;">These details cannot be edited here — they're fetched automatically from your profile.</div>
+
+    <div class="sp-readonly-row">
+      <div class="sp-ro-icon"><i class="bi bi-person-fill"></i></div>
+      <div><div class="sp-ro-label">Full Name</div><div class="sp-ro-value">{{ user.business_name or user.name or '—' }}</div></div>
+    </div>
+    <div class="sp-readonly-row">
+      <div class="sp-ro-icon"><i class="bi bi-telephone-fill"></i></div>
+      <div><div class="sp-ro-label">Mobile Number</div><div class="sp-ro-value">{{ user.phone or '—' }}</div></div>
+    </div>
+    <div class="sp-readonly-row">
+      <div class="sp-ro-icon"><i class="bi bi-envelope-fill"></i></div>
+      <div><div class="sp-ro-label">Email Address</div><div class="sp-ro-value">{{ user.email or '—' }}</div></div>
+    </div>
+    <div class="sp-readonly-row">
+      <div class="sp-ro-icon"><i class="bi bi-geo-alt-fill"></i></div>
+      <div><div class="sp-ro-label">Address</div><div class="sp-ro-value">{{ user.address or '—' }}</div></div>
+    </div>
+    <div class="sp-readonly-row">
+      <div class="sp-ro-icon"><i class="bi bi-image-fill"></i></div>
+      <div>
+        <div class="sp-ro-label">Profile Photo</div>
+        <div class="sp-ro-value">
+          {% if user.profile_pic %}
+            <img src="{{ url_for('static', filename='uploads/' ~ user.profile_pic) }}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
+          {% else %}Not uploaded{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if not existing or existing.status == 'rejected' %}
+<form method="POST" action="/register-service-provider" enctype="multipart/form-data">
+
+  <!-- Service Information -->
+  <div class="sp-card">
+    <div class="sp-card-header"><i class="bi bi-tools"></i> Service Information</div>
+    <div class="sp-card-body">
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">Service Category *</label>
+      <select name="category" class="sp-select" required>
+        <option value="">Select your service</option>
+        {% for c in categories %}
+        <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+      </select>
+
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">Experience *</label>
+      <select name="experience" class="sp-select" required>
+        <option value="">Select experience</option>
+        {% for e in experience_options %}
+        <option value="{{ e }}">{{ e }}</option>
+        {% endfor %}
+      </select>
+
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">About Your Service *</label>
+      <textarea name="about" class="sp-textarea" placeholder="Describe your work, skills and experience" required></textarea>
+    </div>
+  </div>
+
+  <!-- Verification Documents -->
+  <div class="sp-card">
+    <div class="sp-card-header"><i class="bi bi-shield-check"></i> Verification Documents</div>
+    <div class="sp-card-body">
+
+      <div class="sp-note"><i class="bi bi-info-circle-fill"></i> <span>Government ID — upload any <strong>2 different</strong> of: Aadhaar, PAN, Driving License, Voter ID, Passport.</span></div>
+
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">Government ID — Document 1 Type *</label>
+      <select name="id_doc1_type" class="sp-select" required>
+        <option value="">Select ID type</option>
+        {% for t in govt_id_types %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+      <div class="sp-file-zone">
+        <input type="file" name="id_doc1" accept="image/*,application/pdf" required>
+        <div class="sp-file-label">📄 Upload Document 1</div>
+        <div class="sp-file-hint">Tap to upload</div>
+      </div>
+
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">Government ID — Document 2 Type *</label>
+      <select name="id_doc2_type" class="sp-select" required>
+        <option value="">Select ID type</option>
+        {% for t in govt_id_types %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+      <div class="sp-file-zone">
+        <input type="file" name="id_doc2" accept="image/*,application/pdf" required>
+        <div class="sp-file-label">📄 Upload Document 2</div>
+        <div class="sp-file-hint">Tap to upload</div>
+      </div>
+
+      <div class="sp-note"><i class="bi bi-info-circle-fill"></i> <span>Professional Proof — pick the one that matches your profile (Skilled Worker / Engineer / Contractor & Business).</span></div>
+
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);">Professional Proof Type *</label>
+      <select name="professional_doc_type" class="sp-select" required>
+        <option value="">Select document type</option>
+        {% for group_name, docs in proof_groups.items() %}
+        <optgroup label="{{ group_name }}">
+          {% for d in docs %}
+          <option value="{{ d }}">{{ d }}</option>
+          {% endfor %}
+        </optgroup>
+        {% endfor %}
+      </select>
+      <div class="sp-file-zone">
+        <input type="file" name="professional_doc" accept="image/*,application/pdf" required>
+        <div class="sp-file-label">📄 Upload Professional Proof</div>
+        <div class="sp-file-hint">Tap to upload</div>
+      </div>
+
+      <button type="submit" class="sp-submit-btn">Submit Application</button>
+    </div>
+  </div>
+</form>
+{% endif %}
+
+<script>
+const spForm = document.querySelector('form[action="/register-service-provider"]');
+if (spForm) {
+  spForm.addEventListener('submit', function(e) {
+    const t1 = this.querySelector("select[name='id_doc1_type']").value;
+    const t2 = this.querySelector("select[name='id_doc2_type']").value;
+    if (t1 && t2 && t1 === t2) {
+      e.preventDefault();
+      alert('Please choose two DIFFERENT Government ID documents (e.g. Aadhaar + PAN).');
+    }
+  });
+}
+</script>
+{% endblock %}

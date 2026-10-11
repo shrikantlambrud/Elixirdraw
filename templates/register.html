@@ -313,7 +313,70 @@
     box-shadow: 0 2px 10px rgba(14,165,233,0.12);
     color: #0284c7;
   }
+/* ── PROFILE IMAGE UPLOAD ── */
+.file-wrap {
+  border: 2px dashed #bae6fd;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+  background: #f0f9ff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
 
+.file-wrap:hover {
+  border-color: #0ea5e9;
+  background: #e0f2fe;
+  transform: translateY(-2px);
+}
+
+/* hidden input */
+.file-wrap input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* icon */
+.file-wrap-icon {
+  font-size: 32px;
+  color: #0ea5e9;
+  margin-bottom: 6px;
+}
+
+/* main text */
+.file-wrap-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0284c7;
+}
+
+/* hint */
+.file-wrap-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* preview image */
+#preview {
+  display: none;
+  margin: 12px auto 0;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #0ea5e9;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.25);
+}
+
+/* when image uploaded */
+.file-wrap.has-image {
+  border-style: solid;
+  background: #ffffff;
+}
   /* ── RESPONSIVE ── */
   @media (max-width: 540px) {
     .card-body { padding: 28px 22px 32px; }
@@ -398,7 +461,20 @@
               Enter 10 digit mobile number
             </div>
           </div>
+         <div class="field-group">
+  <label class="field-label">Profile Picture</label>
 
+  <div class="file-wrap">
+    <input type="file" name="profile_pic" accept="image/*" onchange="previewImage(event)">
+    
+    <i class="bi bi-person-circle file-wrap-icon"></i>
+    <div class="file-wrap-text">Click to upload profile photo</div>
+    <div class="file-wrap-hint">JPG, PNG supported</div>
+
+    <!-- Preview -->
+    <img id="preview" style="display:none; margin-top:10px; width:80px; height:80px; border-radius:50%; object-fit:cover;">
+  </div>
+</div>
           <!-- ── Security ── -->
           <div class="section-label">Account Security</div>
 
@@ -442,5 +518,18 @@
 
   </div>
 </div>
+<script>
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const wrapper = event.target.closest('.file-wrap');
+    const file = event.target.files[0];
+
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+        wrapper.classList.add("has-image");
+    }
+}
+</script>
 
 {% endblock %}

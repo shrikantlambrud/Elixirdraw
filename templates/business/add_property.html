@@ -1,6 +1,6 @@
 {% extends "business/base.html" %}
 {% block title %}Add Property — Business Panel{% endblock %}
-{% block page_title %}Add Property{% endblock %}
+
 
 {% block content %}
 
@@ -375,6 +375,15 @@
           <div class="file-wrap-text" id="fileLabel">Click to upload image</div>
           <div class="file-wrap-hint">JPG, PNG supported</div>
         </div>
+        <div class="field-group">
+  <label class="field-label">Property Image 2</label>
+  <div class="file-wrap">
+    <input type="file" name="image2" onchange="updateFileLabel2(this)">
+    <i class="bi bi-cloud-arrow-up file-wrap-icon"></i>
+    <div class="file-wrap-text" id="fileLabel2">Click to upload second image</div>
+    <div class="file-wrap-hint">JPG, PNG supported</div>
+  </div>
+</div>
       </div>
 
       <div class="field-group">
@@ -386,6 +395,13 @@
           <textarea name="description" class="form-control textarea-ctrl"
                     placeholder="Property description..."></textarea>
         </div>
+      </div>
+
+      <div class="field-group" style="display:flex;align-items:center;gap:10px;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:10px;padding:14px;">
+        <input type="checkbox" name="top_listing" value="1" id="topListingChk" style="width:18px;height:18px;">
+        <label for="topListingChk" style="margin:0;font-size:13px;font-weight:600;color:#9A5B13;cursor:pointer;">
+          🌟 Make this a <strong>Top Listing</strong> (+₹100) — featured on the homepage
+        </label>
       </div>
 
       <button type="submit" class="btn-submit">
@@ -426,6 +442,16 @@
       label.style.color = '';
     }
   }
+  function updateFileLabel2(input) {
+  const label = document.getElementById('fileLabel2');
+  if (input.files && input.files.length > 0) {
+    label.textContent = input.files[0].name;
+    label.style.color = '#0284c7';
+  } else {
+    label.textContent = 'Click to upload second image';
+    label.style.color = '';
+  }
+}
 </script>
 
 {% endblock %}

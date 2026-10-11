@@ -1,393 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>{% block title %}ElixirDraw{% endblock %}</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Personal Panel{% endblock %}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #5B4FE9;
+  --primary-dark: #4338CA;
+  --primary-light: #EEF2FF;
+  --primary-mid: #818CF8;
+  --green: #22C55E;
+  --green-dark: #16A34A;
+  --green-light: #DCFCE7;
+  --amber: #F59E0B;
+  --red: #EF4444;
+  --white: #ffffff;
+  --bg: #F4F6FB;
+  --text-dark: #0F172A;
+  --text-mid: #334155;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  --card-shadow: 0 2px 12px rgba(91,79,233,0.08);
+  --font: 'DM Sans', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --nav-h: 64px;
+  --bottom-nav: 68px;
+}
 
-  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── VARIABLES ── */
-    :root {
-      --primary:        #0ea5e9;
-      --primary-dark:   #0284c7;
-      --primary-light:  #e0f2fe;
-      --primary-xlight: #f0f9ff;
-      --white:          #ffffff;
-      --text-dark:      #0f172a;
-      --text-mid:       #334155;
-      --text-muted:     #64748b;
-      --border:         #e2e8f0;
-      --bg-page:        #f0f9ff;
-      --shadow-nav:     0 1px 12px rgba(14,165,233,0.10);
-      --font:           'Plus Jakarta Sans', sans-serif;
-    }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-dark);
+  padding-bottom: var(--bottom-nav);
+}
 
-    *, *::before, *::after { box-sizing: border-box; }
+/* ===== TOPBAR ===== */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 200;
+}
 
-    body {
-      font-family: var(--font);
-      background: var(--bg-page);
-      color: var(--text-dark);
-      margin: 0;
-      padding-bottom: 72px;
-    }
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
 
-    /* ── NAVBAR ── */
-    .site-navbar {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-nav);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 0;
-    }
+.brand-logo {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.brand-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    .site-navbar .container {
-      height: 64px;
-      display: flex;
-      align-items: center;
-    }
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
 
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
+.brand-name span { color: var(--primary); }
 
-    .nav-brand-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 17px;
-      flex-shrink: 0;
-    }
+.topbar-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: -2px;
+}
 
-    .nav-brand-name {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text-dark);
-      letter-spacing: -0.3px;
-    }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .nav-brand-name span { color: var(--primary); }
+.notif-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  color: var(--text-mid);
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+}
 
-    .site-navbar .navbar-toggler {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 5px 9px;
-      margin-left: auto;
-    }
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
 
-    .site-navbar .navbar-toggler:focus {
-      box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
-    }
+.user-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+}
 
-    .site-navbar .navbar-nav {
-      align-items: center;
-      gap: 2px;
-    }
+.user-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
 
-    .site-navbar .nav-link {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-mid);
-      padding: 7px 12px;
-      border-radius: 8px;
-      transition: background 0.15s, color 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
+/* ===== SEARCH BAR ===== */
+.search-bar-wrap {
+  padding: 14px 16px 0;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
 
-    .site-navbar .nav-link i { font-size: 15px; }
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
 
-    .site-navbar .nav-link:hover {
-      background: var(--primary-xlight);
-      color: var(--primary-dark);
-    }
+.search-bar i { color: var(--text-muted); font-size: 16px; }
 
-    .site-navbar .nav-link.active {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      font-weight: 600;
-    }
+.search-bar input {
+  flex: 1;
+  border: none; outline: none;
+  background: transparent;
+  font-size: 14px; font-family: var(--font);
+  color: var(--text-dark);
+}
 
-    .nav-logout {
-      font-size: 13px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: 8px;
-      border: 1.5px solid #fecaca;
-      color: #dc2626;
-      background: #fff5f5;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s, border-color 0.15s;
-      white-space: nowrap;
-      margin-left: 4px;
-    }
+.search-bar input::placeholder { color: var(--text-muted); }
 
-    .nav-logout:hover {
-      background: #fee2e2;
-      border-color: #fca5a5;
-      color: #dc2626;
-    }
+.search-filter-btn {
+  width: 32px; height: 32px;
+  background: var(--primary-light);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
 
-    /* collapsed mobile nav */
-    @media (max-width: 991px) {
-      .site-navbar .container { height: 60px; }
+/* ===== MAIN CONTENT ===== */
+.content-wrap {
+  padding-top: calc(var(--nav-h));
+}
 
-      .site-navbar .navbar-collapse {
-        background: var(--white);
-        border-top: 1px solid var(--border);
-        padding: 10px 0 14px;
-        margin: 0 -12px;
-        padding-left: 12px;
-        padding-right: 12px;
-      }
+.page-content {
+  padding: 16px;
+}
 
-      .site-navbar .navbar-nav { gap: 0; align-items: stretch; }
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--bottom-nav);
+  background: #fff;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 200;
+  padding: 0 4px;
+}
 
-      .site-navbar .nav-link {
-        padding: 11px 12px;
-        border-radius: 0;
-        border-bottom: 1px solid var(--border);
-      }
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--text-muted);
+  padding: 6px 4px;
+  border-radius: 12px;
+  transition: color 0.15s;
+  font-size: 11px;
+  font-weight: 500;
+}
 
-      .nav-logout {
-        margin: 10px 0 0;
-        border-radius: 8px;
-        justify-content: center;
-      }
-    }
+.nav-item i { font-size: 22px; display: block; }
 
-    /* ── MAIN CONTENT ── */
-    .main-content {
-      padding: 24px 0;
-    }
+.nav-item.active { color: var(--primary); }
 
-    /* ── CARDS ── */
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(14,165,233,0.07);
-      transition: transform 0.2s, box-shadow 0.2s;
-      background: var(--white);
-    }
+.nav-item.active i {
+  background: var(--primary-light);
+  border-radius: 10px;
+  padding: 4px 10px;
+  display: block;
+}
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 24px rgba(14,165,233,0.14);
-    }
+/* ===== SECTION HEADER ===== */
+.sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
 
-    /* ── FOOTER ── */
-    .site-footer {
-      background: var(--white);
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 14px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+.sec-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
 
-    /* ── MOBILE BOTTOM NAV ── */
-    .mobile-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: var(--white);
-      border-top: 1px solid var(--border);
-      box-shadow: 0 -4px 16px rgba(14,165,233,0.08);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 6px 0 8px;
-      z-index: 999;
-    }
+.sec-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
 
-    .mob-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      text-decoration: none;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 500;
-      padding: 4px 8px;
-      border-radius: 10px;
-      transition: color 0.15s, background 0.15s;
-      min-width: 50px;
-    }
+/* ===== PROPERTY CARD ===== */
+.prop-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  position: relative;
+}
 
-    .mob-item i {
-      font-size: 19px;
-      display: block;
-      line-height: 1;
-    }
+.prop-img-wrap {
+  position: relative;
+  overflow: hidden;
+}
 
-    .mob-item.active,
-    .mob-item:hover {
-      color: var(--primary);
-      background: var(--primary-xlight);
-    }
+.prop-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
 
-    .mob-item.mob-logout {
-      color: #dc2626;
-    }
+.prop-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
 
-    .mob-item.mob-logout:hover {
-      background: #fff5f5;
-      color: #dc2626;
-    }
+.prop-badge.sale { background: var(--green); }
+.prop-badge.rent { background: var(--primary); }
 
-    @media (min-width: 768px) {
-      .mobile-nav { display: none; }
-      body { padding-bottom: 0; }
-    }
+.prop-heart {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-  </style>
+.prop-body {
+  padding: 12px;
+}
 
+.prop-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.prop-loc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.prop-price {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.prop-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===== SERVICE GRID ===== */
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.service-item {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 8px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-dark);
+  transition: box-shadow 0.2s;
+}
+
+.service-item:hover { box-shadow: 0 4px 14px rgba(91,79,233,0.12); }
+
+.service-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  margin: 0 auto 8px;
+}
+
+.service-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-mid);
+  line-height: 1.2;
+}
+
+/* ===== PROMO BANNER ===== */
+.promo-banner {
+  background: linear-gradient(135deg, #2D1A8E 0%, var(--primary) 60%, #7C3AED 100%);
+  border-radius: 16px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+}
+
+.promo-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.promo-icon { font-size: 32px; }
+
+.promo-text { color: #fff; }
+.promo-text .win { font-size: 11px; font-weight: 600; opacity: 0.8; }
+.promo-text .amount { font-size: 20px; font-weight: 900; font-family: var(--font-display); letter-spacing: -0.5px; }
+.promo-text .label { font-size: 11px; font-weight: 600; opacity: 0.7; }
+
+.promo-mid-divider {
+  width: 1px;
+  height: 50px;
+  background: rgba(255,255,255,0.3);
+  margin: 0 4px;
+}
+
+.promo-btn {
+  background: #F59E0B;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ===== PROP CATEGORY TILES ===== */
+.prop-category-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.prop-cat-tile {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.prop-cat-tile:hover {
+  box-shadow: 0 4px 16px rgba(91,79,233,0.1);
+  border-color: var(--primary-mid);
+}
+
+.cat-icon { font-size: 26px; }
+
+.cat-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cat-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* ===== HORIZONTAL SCROLL ===== */
+.h-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+
+.h-scroll::-webkit-scrollbar { display: none; }
+
+.h-scroll .prop-card { min-width: 220px; flex-shrink: 0; }
+
+/* ===== FLASH MESSAGES ===== */
+.flash-container {
+  position: fixed;
+  top: 72px; right: 14px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flash-msg {
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(80px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.flash-msg.success { background: var(--green); }
+.flash-msg.danger  { background: var(--red); }
+.flash-msg.warning { background: var(--amber); }
+
+/* ===== SIDEBAR (DESKTOP) ===== */
+@media (min-width: 768px) {
+  .sidebar-desktop {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    width: 230px;
+    bottom: 0;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .sidebar-nav a i { font-size: 18px; }
+
+  .sidebar-nav a:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .sidebar-nav a.active {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--red);
+    background: #FEF2F2;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+
+  .sidebar-logout:hover { background: #FEE2E2; }
+  .sidebar-logout i { font-size: 18px; }
+
+  .content-wrap {
+    margin-left: 230px;
+  }
+
+  body { padding-bottom: 0; }
+  .bottom-nav { display: none; }
+}
+</style>
 </head>
 <body>
 
-  <!-- ── NAVBAR ── -->
-  <nav class="site-navbar navbar navbar-expand-lg">
-    <div class="container">
+<!-- ===== FLASH ===== -->
+<div class="flash-container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash-msg {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+</div>
 
-      <a class="nav-brand navbar-brand" href="/personal/dashboard">
-        <div class="nav-brand-icon"><i class="bi bi-house-fill"></i></div>
-        <span class="nav-brand-name">Personal <span>Panel</span></span>
-      </a>
-
-      <button class="navbar-toggler" type="button"
-              data-bs-toggle="collapse" data-bs-target="#personalNav"
-              aria-controls="personalNav" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="bi bi-list" style="font-size:20px; color:var(--text-mid);"></i>
-      </button>
-
-      <div class="collapse navbar-collapse" id="personalNav">
-        <ul class="navbar-nav ms-auto align-items-lg-center">
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/dashboard' in request.path %}active{% endif %}"
-               href="/personal/dashboard">
-              <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/properties' in request.path %}active{% endif %}"
-               href="/personal/properties">
-              <i class="bi bi-building"></i> Properties
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/add_rent' in request.path %}active{% endif %}"
-               href="/personal/add_rent">
-              <i class="bi bi-house-door"></i> Add Rent
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/materials' in request.path %}active{% endif %}"
-               href="/personal/materials">
-              <i class="bi bi-box"></i> Materials
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/wallet' in request.path %}active{% endif %}"
-               href="/personal/wallet">
-              <i class="bi bi-wallet2"></i> Wallet
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link {% if '/personal/profile' in request.path %}active{% endif %}"
-               href="/personal/profile">
-              <i class="bi bi-person-circle"></i> Profile
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-logout" href="/logout">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-          </li>
-
-        </ul>
-      </div>
-
+<!-- ===== TOPBAR ===== -->
+<div class="topbar">
+  <a href="/personal/dashboard" class="topbar-brand">
+    <div class="brand-logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="ElixirDraw"></div>
+    <div>
+      <div class="brand-name">Elixir<span>Draw</span></div>
+      <div class="topbar-subtitle">Find Properties & Services</div>
     </div>
-  </nav>
-
-   <!-- ── MAIN CONTENT ── -->
-  <div class="container main-content">
-    {% block content %}
-    {% endblock %}
+  </a>
+  <div class="topbar-right">
+    <a href="#" class="notif-btn">
+      <i class="bi bi-bell"></i>
+      <span class="notif-dot"></span>
+    </a>
+    <div class="user-avatar">
+      {% if user and user.profile_pic %}
+      <img src="{{ url_for('static', filename='uploads/' ~ user.profile_pic) }}">
+      {% else %}
+      {{ (user.name[0] if user else 'U')|upper }}
+      {% endif %}
+    </div>
   </div>
+</div>
 
-  <!-- ── MOBILE BOTTOM NAV ── -->
-  <nav class="mobile-nav d-md-none" aria-label="Mobile navigation">
-
-    <a class="mob-item {% if '/personal/dashboard' in request.path %}active{% endif %}"
-       href="/personal/dashboard">
-      <i class="bi bi-speedometer2"></i> Home
+<!-- ===== DESKTOP SIDEBAR ===== -->
+<div class="sidebar-desktop d-none d-md-flex flex-column">
+  <nav class="sidebar-nav">
+    <a href="/personal/dashboard" class="{% if request.path == '/personal/dashboard' %}active{% endif %}">
+      <i class="bi bi-house{% if request.path == '/personal/dashboard' %}-fill{% endif %}"></i> Home
     </a>
-
-    <a class="mob-item {% if '/personal/properties' in request.path %}active{% endif %}"
-       href="/personal/properties">
-      <i class="bi bi-building"></i> Property
+    <a href="/personal/properties" class="{% if '/properties' in request.path %}active{% endif %}">
+      <i class="bi bi-building{% if '/properties' in request.path %}-fill{% endif %}"></i> Properties
     </a>
-
-    <a class="mob-item {% if '/personal/add_rent' in request.path %}active{% endif %}"
-       href="/personal/add_rent">
-      <i class="bi bi-house-door"></i> Rent
+    <a href="/personal/materials" class="{% if '/materials' in request.path %}active{% endif %}">
+      <i class="bi bi-layers{% if '/materials' in request.path %}-fill{% endif %}"></i> Materials
     </a>
-
-    <a class="mob-item {% if '/personal/wallet' in request.path %}active{% endif %}"
-       href="/personal/wallet">
-      <i class="bi bi-wallet2"></i> Wallet
+    <a href="/offers" class="{% if '/offers' in request.path %}active{% endif %}">
+      <i class="bi bi-gift{% if '/offers' in request.path %}-fill{% endif %}"></i> Offers
     </a>
-
-    <a class="mob-item {% if '/personal/profile' in request.path %}active{% endif %}"
-       href="/personal/profile">
-      <i class="bi bi-person-circle"></i> Profile
+    <a href="/personal/wallet" class="{% if '/wallet' in request.path %}active{% endif %}">
+      <i class="bi bi-wallet{% if '/wallet' in request.path %}-fill{% endif %}"></i> Wallet
     </a>
-
-    <a class="mob-item mob-logout" href="/logout">
-      <i class="bi bi-box-arrow-right"></i> Logout
+    <a href="/personal/profile" class="{% if '/profile' in request.path %}active{% endif %}">
+      <i class="bi bi-person{% if '/profile' in request.path %}-fill{% endif %}"></i> Profile
     </a>
-
   </nav>
+  <a href="/logout" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</div>
 
-  <!-- ── FOOTER ── -->
-  <footer class="site-footer">
-    © 2026 ElixirDraw | All Rights Reserved
-  </footer>
+<!-- ===== MAIN CONTENT ===== -->
+<div class="content-wrap">
+  <div class="page-content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav d-md-none">
+  <a href="/personal/dashboard" class="nav-item {% if request.path == '/personal/dashboard' %}active{% endif %}">
+    <i class="bi bi-house-fill"></i>Home
+  </a>
+  <a href="/personal/properties" class="nav-item {% if '/properties' in request.path %}active{% endif %}">
+    <i class="bi bi-building"></i>Properties
+  </a>
+  <a href="/personal/materials" class="nav-item {% if '/materials' in request.path %}active{% endif %}">
+    <i class="bi bi-layers"></i>Materials
+  </a>
+  <a href="/offers" class="nav-item {% if '/offers' in request.path %}active{% endif %}">
+    <i class="bi bi-gift"></i>Offer
+  </a>
+  <a href="/personal/wallet" class="nav-item {% if '/wallet' in request.path %}active{% endif %}">
+    <i class="bi bi-wallet"></i>Wallet
+  </a>
+  <a href="/personal/profile" class="nav-item {% if '/profile' in request.path %}active{% endif %}">
+    <i class="bi bi-person"></i>Profile
+  </a>
+</nav>
 
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.flash-msg').forEach(el => {
+    el.style.transition = 'opacity 0.4s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 400);
+  });
+}, 3000);
+</script>
 </body>
 </html>

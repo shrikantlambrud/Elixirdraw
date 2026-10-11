@@ -1,0 +1,121 @@
+{% extends "business/base.html" %}
+{% block title %}My Materials — ElixirDraw{% endblock %}
+
+{% block content %}
+<style>
+.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.page-title { font-size:20px; font-weight:800; color:var(--text-dark); }
+.btn-add { display:flex; align-items:center; gap:6px; background:var(--primary); color:#fff; padding:10px 16px; border-radius:12px; font-size:13px; font-weight:700; text-decoration:none; border:none; }
+
+.filter-tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; margin-bottom:14px; }
+.filter-tabs::-webkit-scrollbar { display:none; }
+.ftab { padding:7px 16px; border-radius:20px; font-size:12px; font-weight:600; border:1.5px solid var(--border); background:#fff; color:var(--text-muted); white-space:nowrap; cursor:pointer; transition:all 0.15s; }
+.ftab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+.mat-card { background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:12px; box-shadow:var(--card-shadow); }
+.mat-card-header { display:flex; align-items:center; gap:12px; padding:12px; border-bottom:1px solid #F8FAFC; }
+.mat-thumb { width:52px; height:52px; border-radius:10px; overflow:hidden; flex-shrink:0; background:#F1F5F9; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.mat-thumb img { width:100%; height:100%; object-fit:cover; }
+.mat-header-info { flex:1; min-width:0; }
+.mat-name { font-size:14px; font-weight:700; color:var(--text-dark); }
+.mat-brand { font-size:12px; color:var(--text-muted); }
+.stock-badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+.stock-in { background:var(--primary-light); color:var(--primary); }
+.stock-out { background:#FEE2E2; color:#991B1B; }
+.mat-card-body { padding:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.mat-stat { text-align:center; }
+.mat-stat-val { font-size:14px; font-weight:700; color:var(--text-dark); }
+.mat-stat-label { font-size:10px; color:var(--text-muted); font-weight:600; }
+.mat-card-footer { padding:10px 12px; border-top:1px solid #F8FAFC; display:flex; gap:8px; }
+.action-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:9px; border-radius:10px; font-size:12px; font-weight:700; text-decoration:none; border:1.5px solid; transition:all 0.15s; cursor:pointer; font-family:var(--font); }
+.action-edit { border-color:#C7D2FE; color:var(--primary); background:#EEF2FF; }
+.action-edit:hover { background:var(--primary); color:#fff; }
+.action-toggle { border-color:var(--border); color:var(--text-muted); background:#F8FAFC; }
+.action-delete { border-color:#FCA5A5; color:#EF4444; background:#FEF2F2; }
+.action-delete:hover { background:#EF4444; color:#fff; }
+</style>
+
+<div class="page-header">
+  <div class="page-title">My Materials</div>
+  <a href="/business/add_material" class="btn-add"><i class="bi bi-plus-lg"></i> Add</a>
+</div>
+
+<div class="filter-tabs">
+  <button class="ftab active" onclick="filterMat(this,'all')">All ({{ materials|length if materials else 0 }})</button>
+  <button class="ftab" onclick="filterMat(this,'in')">In Stock</button>
+  <button class="ftab" onclick="filterMat(this,'low')">Low Stock</button>
+  <button class="ftab" onclick="filterMat(this,'out')">Out of Stock</button>
+</div>
+
+<div class="search-bar mb-3">
+  <i class="bi bi-search"></i>
+  <input type="text" id="matSearch" placeholder="Search your materials...">
+  <button class="search-filter-btn"><i class="bi bi-sliders"></i></button>
+</div>
+
+{% if materials %}
+{% for m in materials %}
+<div class="mat-card" data-stock="{{ 'out' if not m.stock or m.stock|int == 0 else 'low' if m.stock|int < 20 else 'in' }}">
+  <div class="mat-card-header">
+    <div class="mat-thumb">
+      {% if m.image1 %}<img src="{{ url_for('static', filename='uploads/' + m.image1) }}">{% else %}🧱{% endif %}
+    </div>
+    <div class="mat-header-info">
+      <div class="mat-name">{{ m.title }}</div>
+      <div class="mat-brand">{{ m.brand or '' }} · {{ m.unit or 'Bag' }}</div>
+    </div>
+    {% if m.stock and m.stock|int > 0 %}
+    <span class="stock-badge stock-in">In Stock</span>
+    {% else %}
+    <span class="stock-badge stock-out">Out of Stock</span>
+    {% endif %}
+  </div>
+  <div class="mat-card-body">
+    <div class="mat-stat">
+      <div class="mat-stat-val" style="color:var(--primary);">₹{{ m.price }}</div>
+      <div class="mat-stat-label">Price / {{ m.unit or 'Bag' }}</div>
+    </div>
+    <div class="mat-stat">
+      <div class="mat-stat-val">{{ m.stock or 0 }}</div>
+      <div class="mat-stat-label">{{ m.unit or 'Bags' }} Stock</div>
+    </div>
+    <div class="mat-stat">
+      <div class="mat-stat-val">{{ m.min_order or '—' }}</div>
+      <div class="mat-stat-label">Min. Order</div>
+    </div>
+  </div>
+  <div class="mat-card-footer">
+    <a href="/business/add_material" class="action-btn action-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
+    <a href="/business/dashboard" class="action-btn action-toggle"><i class="bi bi-toggle-on"></i> Toggle</a>
+    <a href="/business/dashboard" class="action-btn action-delete"><i class="bi bi-trash-fill"></i></a>
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div style="text-align:center;padding:60px 20px;">
+  <div style="font-size:56px;margin-bottom:16px;">📦</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">No Materials Listed</div>
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Add your first material to start selling.</div>
+  <a href="/business/add_material" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;">
+    <i class="bi bi-plus-circle-fill"></i> Add Material
+  </a>
+</div>
+{% endif %}
+
+<script>
+function filterMat(btn, type) {
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.mat-card[data-stock]').forEach(c => {
+    c.style.display = (type === 'all' || c.dataset.stock === type) ? '' : 'none';
+  });
+}
+
+const s = document.getElementById('matSearch');
+if (s) s.addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.mat-card').forEach(c => { c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none'; });
+});
+</script>
+{% endblock %}

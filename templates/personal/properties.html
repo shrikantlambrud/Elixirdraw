@@ -1,277 +1,421 @@
 {% extends "personal/base.html" %}
-{% block title %}All Properties — Personal Panel{% endblock %}
+{% block title %}Properties — ElixirDraw{% endblock %}
+
 {% block content %}
-
 <style>
+.type-tabs { display:flex; background:#F1F5F9; border-radius:14px; overflow:hidden; padding:4px; gap:4px; margin-bottom:16px; }
+.type-tab { flex:1; padding:10px; border-radius:10px; border:none; font-size:13px; font-weight:700; background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-family:var(--font); }
+.type-tab.active { background:#fff; color:var(--primary); box-shadow:0 2px 8px rgba(91,79,233,0.12); }
 
-  .page-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.4px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.prop-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(min-width:640px) { .prop-grid { grid-template-columns:repeat(3,1fr); } }
+@media(min-width:900px) { .prop-grid { grid-template-columns:repeat(4,1fr); } }
 
-  .page-title-icon {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
-    flex-shrink: 0;
-  }
+.prop-type-tag { display:inline-block; font-size:11px; font-weight:700; color:var(--text-muted); padding:2px 0; margin-top:4px; }
 
-  .page-title-icon svg {
-    width: 20px;
-    height: 20px;
-    stroke: #fff;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
+.prop-actions-row { display:flex; gap:6px; padding:0 2px 8px; }
+.prop-action-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:4px; padding:7px 6px; border-radius:8px; border:none; font-size:11px; font-weight:700; text-decoration:none; cursor:pointer; font-family:var(--font); }
+.prop-action-call { background:#DCFCE7; color:#16A34A; }
+.prop-action-loc { background:#EEF2FF; color:var(--primary); }
 
-  /* ── CARD ── */
-  .custom-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(14,165,233,0.07);
-    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
+.status-badge { position:absolute; top:8px; left:8px; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase; z-index:2; }
+.status-sold { background:#EF4444; color:#fff; }
+.status-rented { background:#8B5CF6; color:#fff; }
+.status-inactive { background:#94A3B8; color:#fff; }
+.status-active { background:#22C55E; color:#fff; }
 
-  .custom-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 28px rgba(14,165,233,0.15);
-    border-color: #bae6fd;
-  }
+.my-post-card { background:#fff; border:1px solid var(--border); border-radius:16px; margin-bottom:14px; overflow:hidden; box-shadow:var(--card-shadow); }
+.my-post-actions { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:10px 12px 12px; }
+.my-post-actions form { margin:0; }
+.mp-btn { width:100%; padding:9px 6px; border-radius:9px; border:none; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font); }
+.mp-btn-sold { background:#FEE2E2; color:#B91C1C; }
+.mp-btn-rented { background:#EDE9FE; color:#6D28D9; }
+.mp-btn-deactivate { background:#F1F5F9; color:#475569; }
+.mp-btn-reactivate { background:#DCFCE7; color:#16A34A; }
+.mp-btn-delete { background:#FEF2F2; color:#EF4444; grid-column:1 / -1; }
 
-  /* ── IMAGE ── */
-  .img-wrap {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .custom-img {
-    height: 200px;
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s;
-  }
-
-  .custom-card:hover .custom-img { transform: scale(1.04); }
-
-  /* ── CARD BODY ── */
-  .card-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .card-body h5 {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-
-  /* ── META ── */
-  .info-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #64748b;
-    margin-bottom: 5px;
-  }
-
-  .info-row svg {
-    width: 14px;
-    height: 14px;
-    stroke: #94a3b8;
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex-shrink: 0;
-  }
-
-  /* ── PRICE ── */
-  .price {
-    font-size: 18px;
-    font-weight: 800;
-    color: #0284c7;
-    letter-spacing: -0.3px;
-    margin: 10px 0 12px;
-  }
-
-  .price span {
-    font-size: 12px;
-    font-weight: 500;
-    color: #94a3b8;
-  }
-
-  /* ── DIVIDER ── */
-  .card-divider {
-    border: none;
-    border-top: 1px solid #f1f5f9;
-    margin: 0 0 12px;
-  }
-
-  /* ── VIEW BUTTON ── */
-  .btn-view {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 9px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1.5px solid #bae6fd;
-    color: #0284c7;
-    background: #f0f9ff;
-    font-family: inherit;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    margin-top: auto;
-  }
-
-  .btn-view svg {
-    width: 14px;
-    height: 14px;
-    stroke: #0284c7;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .btn-view:hover {
-    background: #e0f2fe;
-    border-color: #0ea5e9;
-    box-shadow: 0 2px 10px rgba(14,165,233,0.12);
-    color: #0284c7;
-  }
-
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 64px 20px;
-  }
-
-  .empty-icon {
-    width: 72px;
-    height: 72px;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-  }
-
-  .empty-icon svg {
-    width: 36px;
-    height: 36px;
-    stroke: #0ea5e9;
-    fill: none;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .empty-state h5 { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
-  .empty-state p  { font-size: 14px; color: #64748b; margin: 0; }
-
-  @media (max-width: 768px) {
-    .custom-img { height: 170px; }
-  }
-
+.add-prop-fab { position:fixed; bottom:calc(var(--bottom-nav) + 16px); right:16px; width:54px; height:54px; background:var(--primary); color:#fff; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 6px 20px rgba(91,79,233,0.45); text-decoration:none; z-index:100; transition:transform 0.2s; }
+.add-prop-fab:hover { transform:scale(1.05); color:#fff; }
+@media(min-width:768px) { .add-prop-fab { bottom:24px; } }
 </style>
 
-<div class="container mt-4 mb-5">
-
-  <h4 class="page-title">
-    <div class="page-title-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    All Properties
-  </h4>
-
-  {% if properties %}
-
-  <div class="row g-3">
-    {% for p in properties %}
-
-    <div class="col-lg-3 col-md-4 col-sm-6">
-      <div class="custom-card">
-
-        <div class="img-wrap">
-          <img
-            src="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else 'https://via.placeholder.com/400x200' }}"
-            class="custom-img"
-            alt="{{ p.title }}">
-        </div>
-
-        <div class="card-body">
-
-          <h5>{{ p.title }}</h5>
-
-          <div class="info-row">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            {{ p.business_name }}
-          </div>
-
-          <div class="info-row">
-            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            {{ p.location }}
-          </div>
-
-          {% if p.deposit %}
-          <div class="price">₹{{ p.deposit }} <span>deposit</span></div>
-          {% endif %}
-
-          <hr class="card-divider">
-
-          <a href="#" class="btn-view">
-            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            View Details
-          </a>
-
-        </div>
-      </div>
-    </div>
-
-    {% endfor %}
-  </div>
-
-  {% else %}
-
-  <div class="empty-state">
-    <div class="empty-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    <h5>No Properties Found</h5>
-    <p>There are no properties listed at the moment.</p>
-  </div>
-
-  {% endif %}
-
+<div style="margin-bottom:16px;">
+  <div style="font-size:20px;font-weight:800;color:var(--text-dark);">Properties</div>
 </div>
 
+<!-- Filter tabs -->
+<div class="type-tabs">
+  <button class="type-tab active" onclick="showPane('all')" id="tabAll">All</button>
+  <button class="type-tab" onclick="showPane('sell')" id="tabSell">🏠 For Sale</button>
+  <button class="type-tab" onclick="showPane('rent')" id="tabRent">🔑 For Rent</button>
+  <button class="type-tab" onclick="showPane('mine')" id="tabMine">📋 My Posts</button>
+</div>
+
+<!-- Search (only affects the browse pane) -->
+<div class="search-bar mb-3" id="searchWrap">
+  <i class="bi bi-search"></i>
+  <input type="text" id="propSearch" placeholder="Search properties...">
+  <button class="search-filter-btn"><i class="bi bi-sliders"></i></button>
+</div>
+
+<!-- ============== BROWSE PANE (all / sell / rent) ============== -->
+<div id="browsePane">
+{% if properties %}
+<div class="prop-grid" id="propGrid">
+{% for p in properties %}
+<div class="prop-card" data-type="{{ p.listing_type }}"
+     onclick="openPropDetail(this)"
+     data-title="{{ p.title }}"
+     data-price="{{ p.price }}"
+     data-location="{{ p.location }}"
+     data-listing-type="{{ p.listing_type }}"
+     data-status="{{ p.status or 'active' }}"
+     data-description="{{ p.description or '' }}"
+     data-image="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else '' }}"
+     data-phone="{{ p.phone or '' }}"
+     data-maplink="{{ p.map_link or '' }}"
+     data-property-type="{{ p.property_type or '' }}"
+     data-plot-size="{{ p.plot_size or '' }}"
+     data-deposit="{{ p.deposit or '' }}"
+     data-locality="{{ p.locality or '' }}"
+     data-area-value="{{ p.area_value or '' }}"
+     data-area-unit="{{ p.area_unit or '' }}"
+     data-address="{{ p.full_address or '' }}"
+     style="cursor:pointer;">
+  <div class="prop-img-wrap" style="position:relative;">
+    {% if p.status and p.status != 'active' %}
+    <span class="status-badge status-{{ p.status }}">{{ p.status }}</span>
+    {% endif %}
+    {% if p.image1 %}
+    <img src="{{ url_for('static', filename='uploads/' + p.image1) }}" class="prop-img">
+    {% else %}
+    <div style="height:140px;background:linear-gradient(135deg,#EEF2FF,#C7D2FE);display:flex;align-items:center;justify-content:center;font-size:34px;">🏠</div>
+    {% endif %}
+    <span class="prop-badge {% if p.listing_type == 'rent' %}rent{% else %}sale{% endif %}">
+      {% if p.listing_type == 'rent' %}RENT{% else %}SALE{% endif %}
+    </span>
+    <div class="prop-heart"><i class="bi bi-heart"></i></div>
+  </div>
+  <div class="prop-body">
+    <div class="prop-title" style="font-size:13px;">{{ p.title }}</div>
+    <div class="prop-loc"><i class="bi bi-geo-alt-fill" style="font-size:10px;color:var(--primary);"></i>{{ p.location }}</div>
+    <div class="prop-price" style="font-size:15px;">₹{{ p.price }}{% if p.listing_type == 'rent' %}<span style="font-size:11px;font-weight:500;color:var(--text-muted);">/mo</span>{% endif %}</div>
+    <div class="prop-type-tag">For {{ p.listing_type|capitalize }}</div>
+  </div>
+  <div class="prop-actions-row" onclick="event.stopPropagation();">
+    {% if p.phone %}
+    <a href="tel:{{ p.phone }}" class="prop-action-btn prop-action-call"><i class="bi bi-telephone-fill"></i> Call</a>
+    {% else %}
+    <span class="prop-action-btn prop-action-call" style="opacity:0.5;"><i class="bi bi-telephone-fill"></i> Call</span>
+    {% endif %}
+    {% if p.map_link %}
+    <a href="{{ p.map_link }}" target="_blank" rel="noopener" class="prop-action-btn prop-action-loc"><i class="bi bi-geo-alt-fill"></i> Location</a>
+    {% else %}
+    <a href="https://www.google.com/maps/search/{{ p.location|urlencode }}" target="_blank" rel="noopener" class="prop-action-btn prop-action-loc"><i class="bi bi-geo-alt-fill"></i> Location</a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+
+{% else %}
+<div style="text-align:center;padding:60px 20px;">
+  <div style="font-size:56px;margin-bottom:16px;">🏠</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">No Properties Yet</div>
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Be the first to list a property on ElixirDraw!</div>
+  <a href="/personal/add_property" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;">
+    <i class="bi bi-plus-circle-fill"></i> Post Property
+  </a>
+</div>
+{% endif %}
+</div>
+
+<!-- ============== MY POSTS PANE ============== -->
+<div id="minePane" style="display:none;">
+{% if my_properties %}
+  {% for p in my_properties %}
+  <div class="my-post-card"
+       onclick="openPropDetail(this)"
+       style="cursor:pointer;"
+       data-title="{{ p.title }}"
+       data-price="{{ p.price }}"
+       data-location="{{ p.location }}"
+       data-listing-type="{{ p.listing_type }}"
+       data-status="{{ p.status or 'active' }}"
+       data-description="{{ p.description or '' }}"
+       data-image="{{ url_for('static', filename='uploads/' + p.image1) if p.image1 else '' }}"
+       data-phone=""
+       data-maplink="{{ p.map_link or '' }}"
+       data-property-type="{{ p.property_type or '' }}"
+       data-plot-size="{{ p.plot_size or '' }}"
+       data-deposit="{{ p.deposit or '' }}"
+       data-locality="{{ p.locality or '' }}"
+       data-area-value="{{ p.area_value or '' }}"
+       data-area-unit="{{ p.area_unit or '' }}"
+       data-address="{{ p.full_address or '' }}">
+    <div class="prop-img-wrap" style="position:relative;">
+      <span class="status-badge status-{{ p.status or 'active' }}">{{ p.status or 'active' }}</span>
+      {% if p.image1 %}
+      <img src="{{ url_for('static', filename='uploads/' + p.image1) }}" class="prop-img" style="width:100%;height:160px;object-fit:cover;">
+      {% else %}
+      <div style="height:160px;background:linear-gradient(135deg,#EEF2FF,#C7D2FE);display:flex;align-items:center;justify-content:center;font-size:34px;">🏠</div>
+      {% endif %}
+      <span class="prop-badge {% if p.listing_type == 'rent' %}rent{% else %}sale{% endif %}">
+        {% if p.listing_type == 'rent' %}RENT{% else %}SALE{% endif %}
+      </span>
+    </div>
+    <div class="prop-body" style="padding:12px;">
+      <div class="prop-title" style="font-size:14px;font-weight:700;">{{ p.title }}</div>
+      <div class="prop-loc"><i class="bi bi-geo-alt-fill" style="font-size:10px;color:var(--primary);"></i>{{ p.location }}</div>
+      <div class="prop-price" style="font-size:16px;">₹{{ p.price }}{% if p.listing_type == 'rent' %}<span style="font-size:11px;font-weight:500;color:var(--text-muted);">/mo</span>{% endif %}</div>
+    </div>
+
+    <div class="my-post-actions" onclick="event.stopPropagation();">
+      {% if p.status != 'sold' and p.status != 'rented' %}
+        {% if p.listing_type == 'rent' %}
+        <form action="/property/mark_rented/{{ p.id }}" method="POST">
+          <button type="submit" class="mp-btn mp-btn-rented" onclick="return confirm('Mark this property as Rented?')">🔑 Mark as Rented</button>
+        </form>
+        {% else %}
+        <form action="/property/mark_sold/{{ p.id }}" method="POST">
+          <button type="submit" class="mp-btn mp-btn-sold" onclick="return confirm('Mark this property as Sold?')">✅ Mark as Sold</button>
+        </form>
+        {% endif %}
+      {% else %}
+        <button class="mp-btn mp-btn-sold" disabled style="opacity:0.5;">{{ 'Rented' if p.status == 'rented' else 'Sold' }}</button>
+      {% endif %}
+
+      {% if p.listing_type != 'rent' %}
+      {% if p.status == 'inactive' %}
+      <form action="/property/reactivate/{{ p.id }}" method="POST">
+        <button type="submit" class="mp-btn mp-btn-reactivate">▶️ Reactivate</button>
+      </form>
+      {% else %}
+      <form action="/property/deactivate/{{ p.id }}" method="POST">
+        <button type="submit" class="mp-btn mp-btn-deactivate" onclick="return confirm('Deactivate this listing? It will be hidden from buyers.')">⏸️ Deactivate</button>
+      </form>
+      {% endif %}
+      {% endif %}
+
+      <form action="/property/delete/{{ p.id }}" method="POST">
+        <button type="submit" class="mp-btn mp-btn-delete" onclick="return confirm('Permanently delete this property? This cannot be undone.')">🗑️ Delete Permanently</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+<div style="text-align:center;padding:60px 20px;">
+  <div style="font-size:56px;margin-bottom:16px;">📋</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">You haven't posted any properties yet</div>
+  <a href="/personal/add_property" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;margin-top:10px;">
+    <i class="bi bi-plus-circle-fill"></i> Post Property
+  </a>
+</div>
+{% endif %}
+</div>
+
+<a href="/personal/add_property" class="add-prop-fab">
+  <i class="bi bi-plus-lg"></i>
+</a>
+
+<!-- ============== PROPERTY DETAIL POPUP ============== -->
+<style>
+.prop-detail-overlay {
+  display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6);
+  z-index:1000; align-items:center; justify-content:center; padding:16px;
+  backdrop-filter:blur(2px);
+}
+.prop-detail-overlay.open { display:flex; }
+.prop-detail-card {
+  background:#fff; border-radius:22px; width:100%; max-width:520px;
+  max-height:90vh; overflow-y:auto; position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  animation:propDetailIn 0.18s ease-out;
+}
+@keyframes propDetailIn { from{ opacity:0; transform:scale(0.96) translateY(8px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+.prop-detail-close {
+  position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%;
+  background:rgba(15,23,42,0.55); color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:18px; cursor:pointer; z-index:2; border:none;
+}
+.prop-detail-img-wrap { position:relative; width:100%; height:280px; background:linear-gradient(135deg,#EEF2FF,#C7D2FE); border-radius:22px 22px 0 0; overflow:hidden; }
+.prop-detail-img-wrap img { width:100%; height:100%; object-fit:cover; }
+.prop-detail-img-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:64px; }
+.prop-detail-badge { position:absolute; top:14px; left:14px; font-size:11px; font-weight:800; padding:5px 12px; border-radius:8px; text-transform:uppercase; color:#fff; }
+.prop-detail-badge.sale { background:var(--primary); }
+.prop-detail-badge.rent { background:#8B5CF6; }
+.prop-detail-status { position:absolute; top:14px; right:58px; font-size:10px; font-weight:800; padding:4px 10px; border-radius:6px; text-transform:uppercase; color:#fff; }
+.prop-detail-body { padding:22px; }
+.prop-detail-title { font-size:19px; font-weight:800; color:var(--text-dark); margin-bottom:6px; }
+.prop-detail-loc { font-size:13.5px; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-bottom:14px; }
+.prop-detail-price { font-size:26px; font-weight:900; color:var(--primary); margin-bottom:16px; }
+.prop-detail-price span { font-size:13px; font-weight:600; color:var(--text-muted); }
+.prop-detail-meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+.prop-detail-meta-box { background:#F8FAFF; border-radius:12px; padding:11px 13px; }
+.prop-detail-meta-label { font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
+.prop-detail-meta-value { font-size:14px; font-weight:700; color:var(--text-dark); }
+.prop-detail-desc-label { font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+.prop-detail-desc { font-size:13.5px; color:var(--text-mid); line-height:1.6; margin-bottom:20px; white-space:pre-wrap; }
+.prop-detail-actions { display:flex; gap:10px; }
+.prop-detail-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:7px; padding:13px; border-radius:12px; font-size:14px; font-weight:700; text-decoration:none; }
+.prop-detail-btn-call { background:#DCFCE7; color:#16A34A; }
+.prop-detail-btn-loc { background:#EEF2FF; color:var(--primary); }
+</style>
+
+<div class="prop-detail-overlay" id="propDetailOverlay" onclick="if(event.target===this) closePropDetail();">
+  <div class="prop-detail-card">
+    <button class="prop-detail-close" onclick="closePropDetail();"><i class="bi bi-x-lg"></i></button>
+
+    <div class="prop-detail-img-wrap">
+      <img id="pdImg" style="display:none;">
+      <div id="pdImgPlaceholder" class="prop-detail-img-placeholder">🏠</div>
+      <span class="prop-detail-badge" id="pdBadge"></span>
+      <span class="prop-detail-status" id="pdStatus" style="display:none;"></span>
+    </div>
+
+    <div class="prop-detail-body">
+      <div class="prop-detail-title" id="pdTitle"></div>
+      <div class="prop-detail-loc"><i class="bi bi-geo-alt-fill" style="color:var(--primary);"></i><span id="pdLocation"></span></div>
+      <div class="prop-detail-price" id="pdPrice"></div>
+
+      <div class="prop-detail-meta-grid" id="pdMetaGrid"></div>
+
+      <div id="pdDescWrap">
+        <div class="prop-detail-desc-label">Description</div>
+        <div class="prop-detail-desc" id="pdDesc"></div>
+      </div>
+
+      <div class="prop-detail-actions">
+        <a id="pdCallBtn" class="prop-detail-btn prop-detail-btn-call" href="#"><i class="bi bi-telephone-fill"></i> Call Owner</a>
+        <a id="pdLocBtn" class="prop-detail-btn prop-detail-btn-loc" href="#" target="_blank" rel="noopener"><i class="bi bi-geo-alt-fill"></i> View on Map</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openPropDetail(card) {
+  const d = card.dataset;
+
+  document.getElementById('pdTitle').textContent = d.title;
+  document.getElementById('pdLocation').textContent = d.address && d.address.trim() ? d.address : d.location;
+
+  const isRent = d.listingType === 'rent';
+  document.getElementById('pdPrice').innerHTML = '₹' + d.price + (isRent ? ' <span>/month</span>' : '');
+
+  const badge = document.getElementById('pdBadge');
+  badge.textContent = isRent ? 'RENT' : 'SALE';
+  badge.className = 'prop-detail-badge ' + (isRent ? 'rent' : 'sale');
+
+  const statusEl = document.getElementById('pdStatus');
+  if (d.status && d.status !== 'active') {
+    statusEl.textContent = d.status;
+    statusEl.style.display = 'inline-block';
+    statusEl.style.background = d.status === 'sold' ? '#EF4444' : d.status === 'rented' ? '#8B5CF6' : '#94A3B8';
+  } else {
+    statusEl.style.display = 'none';
+  }
+
+  const img = document.getElementById('pdImg');
+  const placeholder = document.getElementById('pdImgPlaceholder');
+  if (d.image) {
+    img.src = d.image;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+
+  // Meta grid: property type, plot size / deposit depending on listing type
+  let metaHtml = '';
+  if (d.propertyType) {
+    metaHtml += `<div class="prop-detail-meta-box"><div class="prop-detail-meta-label">Type</div><div class="prop-detail-meta-value">${d.propertyType}</div></div>`;
+  }
+  if (isRent && d.deposit) {
+    metaHtml += `<div class="prop-detail-meta-box"><div class="prop-detail-meta-label">Deposit</div><div class="prop-detail-meta-value">₹${d.deposit}</div></div>`;
+  }
+  if (!isRent && d.plotSize) {
+    metaHtml += `<div class="prop-detail-meta-box"><div class="prop-detail-meta-label">Plot Size</div><div class="prop-detail-meta-value">${d.plotSize}</div></div>`;
+  }
+  if (d.areaValue) {
+    metaHtml += `<div class="prop-detail-meta-box"><div class="prop-detail-meta-label">Area</div><div class="prop-detail-meta-value">${d.areaValue}${d.areaUnit ? ' ' + d.areaUnit : ''}</div></div>`;
+  }
+  document.getElementById('pdMetaGrid').innerHTML = metaHtml;
+  document.getElementById('pdMetaGrid').style.display = metaHtml ? 'grid' : 'none';
+
+  const descWrap = document.getElementById('pdDescWrap');
+  if (d.description && d.description.trim()) {
+    document.getElementById('pdDesc').textContent = d.description;
+    descWrap.style.display = 'block';
+  } else {
+    descWrap.style.display = 'none';
+  }
+
+  const callBtn = document.getElementById('pdCallBtn');
+  if (d.phone) {
+    callBtn.href = 'tel:' + d.phone;
+    callBtn.style.opacity = '1';
+    callBtn.style.pointerEvents = 'auto';
+  } else {
+    callBtn.href = '#';
+    callBtn.style.opacity = '0.5';
+    callBtn.style.pointerEvents = 'none';
+  }
+
+  const locBtn = document.getElementById('pdLocBtn');
+  locBtn.href = d.maplink && d.maplink.trim()
+    ? d.maplink
+    : 'https://www.google.com/maps/search/' + encodeURIComponent(d.location);
+
+  document.getElementById('propDetailOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePropDetail() {
+  document.getElementById('propDetailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePropDetail();
+});
+</script>
+
+<script>
+function showPane(type) {
+  document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+
+  if (type === 'mine') {
+    document.getElementById('tabMine').classList.add('active');
+    document.getElementById('browsePane').style.display = 'none';
+    document.getElementById('minePane').style.display = 'block';
+    document.getElementById('searchWrap').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('browsePane').style.display = 'block';
+  document.getElementById('minePane').style.display = 'none';
+  document.getElementById('searchWrap').style.display = 'flex';
+
+  const btn = type === 'all' ? document.getElementById('tabAll')
+            : type === 'sell' ? document.getElementById('tabSell')
+            : document.getElementById('tabRent');
+  btn.classList.add('active');
+
+  document.querySelectorAll('.prop-card[data-type]').forEach(card => {
+    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
+  });
+}
+
+const propSearch = document.getElementById('propSearch');
+if (propSearch) {
+  propSearch.addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.prop-card').forEach(card => {
+      card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+}
+</script>
 {% endblock %}

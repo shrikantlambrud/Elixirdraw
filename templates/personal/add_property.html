@@ -1,0 +1,246 @@
+{% extends "personal/base.html" %}
+
+{% block page_title %}
+Post Property
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* CARD */
+.post-card{
+  max-width:620px;
+  margin:auto;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter: blur(6px);
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* TOGGLE */
+.toggle-box{
+  display:flex;
+  background:#e2e8f0;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.toggle-box button{
+  flex:1;
+  border:none;
+  padding:10px;
+  font-weight:600;
+  background:transparent;
+}
+
+.toggle-box .active{
+  background:#0ea5e9;
+  color:#fff;
+}
+
+/* GRID */
+.grid-2{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+/* INPUT */
+.form-control, .form-select{
+  border-radius:12px;
+  padding:10px;
+  font-size:14px;
+}
+
+/* UPLOAD */
+.upload-box{
+  border:2px dashed #cbd5e1;
+  padding:20px;
+  text-align:center;
+  border-radius:14px;
+  background:#f8fafc;
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* BUTTON */
+.publish-btn{
+  background:#0ea5e9;
+  color:#fff;
+  border:none;
+  width:100%;
+  padding:13px;
+  border-radius:12px;
+  font-weight:600;
+}
+
+/* MAP */
+.map-preview{
+  width:100%;
+  height:200px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:10px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .post-card{
+    margin-top:10px;
+  }
+}
+
+</style>
+
+<div class="container-fluid px-2">
+
+<div class="post-card">
+
+<!-- TOGGLE -->
+<div class="toggle-box mb-3">
+  <button type="button" class="active" id="sellBtn">Sell</button>
+  <button type="button" id="rentBtn">Rent</button>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input type="hidden" name="purpose" id="purpose" value="Sell">
+
+<!-- TITLE -->
+<input name="title" placeholder="e.g. 2BHK near City Center"
+class="form-control mb-2" required>
+
+<!-- PROPERTY TYPE -->
+<select name="property_type" class="form-select mb-2" id="propertyType">
+  <option value="">Property Type</option>
+  <option value="flat">Flat / Apartment</option>
+  <option value="house">House / Villa</option>
+  <option value="plot">Plot</option>
+  <option value="shop">Shop</option>
+</select>
+
+<!-- FLAT TYPE -->
+<select name="flat_type" class="form-select mb-2" id="flatType" style="display:none;">
+  <option value="">Flat Type</option>
+  <option value="1RK">1 RK</option>
+  <option value="1BHK">1 BHK</option>
+  <option value="2BHK">2 BHK</option>
+  <option value="3BHK">3 BHK</option>
+</select>
+
+<!-- PRICE -->
+<input name="price" id="priceField" type="number"
+class="form-control mb-2" placeholder="Total Price (₹)" required>
+
+<!-- DEPOSIT -->
+<input name="deposit" id="depositField" type="number"
+class="form-control mb-2" placeholder="Deposit (₹)" style="display:none;">
+
+<!-- AREA -->
+<div class="grid-2 mb-2">
+  <input name="area" type="number" class="form-control" placeholder="Area">
+  <select name="area_unit" class="form-select">
+    <option>sq ft</option>
+    <option>Acre</option>
+    <option>Guntha</option>
+  </select>
+</div>
+
+<!-- LOCATION -->
+<div class="grid-2 mb-2">
+  <input name="city" class="form-control" placeholder="City">
+  <input name="locality" class="form-control" placeholder="Locality">
+</div>
+
+<input name="address" class="form-control mb-2" placeholder="Full Address">
+
+<!-- MAP -->
+<input name="map_link" id="map_link"
+placeholder="Google Map Embed Link"
+class="form-control mb-2">
+
+<iframe id="map_preview" class="map-preview" style="display:none;"></iframe>
+
+<!-- DESCRIPTION -->
+<textarea name="description" class="form-control mb-3"
+placeholder="Property Description"></textarea>
+
+<!-- TOP LISTING -->
+<div style="display:flex;align-items:center;gap:10px;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:10px;padding:14px;margin-bottom:12px;">
+  <input type="checkbox" name="top_listing" value="1" id="topListingChk" style="width:18px;height:18px;">
+  <label for="topListingChk" style="margin:0;font-size:13px;font-weight:600;color:#9A5B13;cursor:pointer;">
+    🌟 Make this a <strong>Top Listing</strong> (+₹100) — featured on the home page
+  </label>
+</div>
+
+<!-- PHOTOS -->
+<h6 class="mb-2">Photos</h6>
+
+<div class="upload-box mb-2" onclick="photoInput.click()">
+📷 Tap to upload photo
+</div>
+
+<input type="file" name="image1" id="photoInput" hidden>
+
+<div id="preview" class="d-flex flex-wrap gap-2 mb-3"></div>
+
+<button class="publish-btn">🚀 Publish Property</button>
+
+</form>
+
+</div>
+</div>
+
+<script>
+
+// SELL / RENT TOGGLE
+sellBtn.onclick = () => {
+  sellBtn.classList.add("active");
+  rentBtn.classList.remove("active");
+
+  purpose.value = "Sell";
+  priceField.placeholder = "Total Price (₹)";
+  depositField.style.display = "none";
+};
+
+rentBtn.onclick = () => {
+  rentBtn.classList.add("active");
+  sellBtn.classList.remove("active");
+
+  purpose.value = "Rent";
+  priceField.placeholder = "Monthly Rent (₹)";
+  depositField.style.display = "block";
+};
+
+// PROPERTY TYPE
+propertyType.onchange = () => {
+  flatType.style.display = propertyType.value === "flat" ? "block" : "none";
+};
+
+// IMAGE PREVIEW
+photoInput.addEventListener("change", () => {
+  preview.innerHTML = "";
+
+  const file = photoInput.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.innerHTML = `<img src="${e.target.result}" width="80" style="border-radius:10px;">`;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// MAP PREVIEW
+map_link.addEventListener("input", () => {
+  if(map_link.value){
+    map_preview.style.display = "block";
+    map_preview.src = map_link.value;
+  }
+});
+
+</script>
+
+{% endblock %}

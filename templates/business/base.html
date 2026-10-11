@@ -1,399 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>{% block title %}ElixirDraw Business{% endblock %}</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Business Dashboard{% endblock %}</title>
+<style>
+:root {
+  --primary: #1A6B3C;
+  --primary-dark: #145530;
+  --primary-light: #DCFCE7;
+  --primary-mid: #4ADE80;
+  --accent: #F59E0B;
+  --red: #EF4444;
+  --white: #fff;
+  --bg: #F4F6FB;
+  --text-dark: #0F172A;
+  --text-mid: #334155;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  --card-shadow: 0 2px 12px rgba(26,107,60,0.08);
+  --font: 'DM Sans', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --nav-h: 64px;
+  --bottom-nav: 68px;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:var(--font); background:var(--bg); color:var(--text-dark); padding-bottom:var(--bottom-nav); }
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+.topbar { position:fixed; top:0; left:0; right:0; height:var(--nav-h); background:#fff; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 18px; z-index:200; }
+.topbar-brand { display:flex; align-items:center; gap:9px; text-decoration:none; }
+.brand-logo { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+.brand-logo img { width:100%; height:100%; object-fit:contain; }
+.brand-name { font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--text-dark); }
+.brand-name span { color:var(--primary); }
+.topbar-subtitle { font-size:11px; color:var(--text-muted); font-weight:500; margin-top:-2px; }
+.topbar-right { display:flex; align-items:center; gap:10px; }
+.notif-btn { width:38px; height:38px; border-radius:50%; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text-mid); position:relative; text-decoration:none; }
+.notif-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; background:var(--red); border-radius:50%; border:1.5px solid #fff; }
+.user-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary-mid)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; overflow:hidden; }
+.user-avatar img { width:100%; height:100%; object-fit:cover; }
 
-  <style>
+.content-wrap { padding-top:var(--nav-h); }
+.page-content { padding:16px; }
 
-    :root {
-      --primary:        #0ea5e9;
-      --primary-dark:   #0284c7;
-      --primary-light:  #e0f2fe;
-      --primary-xlight: #f0f9ff;
-      --white:          #ffffff;
-      --text-dark:      #0f172a;
-      --text-mid:       #334155;
-      --text-muted:     #64748b;
-      --border:         #e2e8f0;
-      --bg-page:        #f0f9ff;
-      --sidebar-w:      240px;
-      --topbar-h:       64px;
-      --font:           'Plus Jakarta Sans', sans-serif;
-    }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--bottom-nav); background:#fff; border-top:1px solid var(--border); display:flex; justify-content:space-around; align-items:center; z-index:200; padding:0 4px; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; text-decoration:none; color:var(--text-muted); padding:6px 4px; border-radius:12px; font-size:11px; font-weight:500; }
+.nav-item i { font-size:22px; display:block; }
+.nav-item.active { color:var(--primary); }
+.nav-item.active i { background:var(--primary-light); border-radius:10px; padding:4px 10px; display:block; }
+.nav-add-wrap { flex:1; display:flex; justify-content:center; align-items:center; }
+.nav-add-btn { width:50px; height:50px; border-radius:16px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 4px 16px rgba(26,107,60,0.4); margin-top:-16px; border:3px solid #fff; text-decoration:none; }
 
-    *, *::before, *::after { box-sizing: border-box; }
+.flash-container { position:fixed; top:72px; right:14px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+.flash-msg { padding:11px 16px; border-radius:12px; font-size:13px; font-weight:600; color:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.15); animation:slideIn 0.3s ease; }
+@keyframes slideIn { from{transform:translateX(80px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.flash-msg.success { background:#22C55E; }
+.flash-msg.danger  { background:#EF4444; }
+.flash-msg.warning { background:#F59E0B; }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg-page);
-      color: var(--text-dark);
-      margin: 0;
-    }
+/* Stats */
+.stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+@media(min-width:640px){ .stats-grid{ grid-template-columns:repeat(4,1fr); } }
+.stat-card { background:#fff; border-radius:14px; border:1px solid var(--border); padding:16px; box-shadow:var(--card-shadow); }
+.stat-label { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; }
+.stat-value { font-size:22px; font-weight:900; color:var(--primary); letter-spacing:-0.5px; font-family:var(--font-display); }
+.stat-view { font-size:11px; color:var(--primary); font-weight:600; margin-top:4px; text-decoration:none; display:inline-block; }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-w);
-      height: 100vh;
-      background: var(--white);
-      border-right: 1px solid var(--border);
-      position: fixed;
-      top: 0; left: 0;
-      display: flex;
-      flex-direction: column;
-      z-index: 1000;
-      box-shadow: 2px 0 12px rgba(14,165,233,0.06);
-      transition: left 0.25s ease;
-      overflow-y: auto;
-    }
-
-    /* sidebar top accent */
-    .sidebar-header {
-      padding: 20px 18px 16px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .sidebar-brand-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-      font-size: 17px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(14,165,233,0.25);
-    }
-
-    .sidebar-brand-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text-dark);
-      letter-spacing: -0.3px;
-      line-height: 1.1;
-    }
-
-    .sidebar-brand-name span { color: var(--primary); display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); }
-
-    /* nav links */
-    .sidebar-nav {
-      padding: 14px 10px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .sidebar-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 10px 10px 4px;
-    }
-
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-mid);
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .sidebar-link i {
-      font-size: 16px;
-      width: 20px;
-      text-align: center;
-      flex-shrink: 0;
-      color: var(--text-muted);
-      transition: color 0.15s;
-    }
-
-    .sidebar-link:hover {
-      background: var(--primary-xlight);
-      color: var(--primary-dark);
-    }
-
-    .sidebar-link:hover i { color: var(--primary); }
-
-    .sidebar-link.active {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      font-weight: 700;
-    }
-
-    .sidebar-link.active i { color: var(--primary); }
-
-    /* logout */
-    .sidebar-footer {
-      padding: 12px 10px 16px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .sidebar-logout {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      color: #dc2626;
-      background: #fff5f5;
-      border: 1px solid #fecaca;
-      transition: background 0.15s;
-    }
-
-    .sidebar-logout i { font-size: 16px; }
-    .sidebar-logout:hover { background: #fee2e2; color: #dc2626; }
-
-    /* ── OVERLAY (mobile) ── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.35);
-      z-index: 999;
-    }
-
-    .sidebar-overlay.show { display: block; }
-
-    /* ── TOPBAR ── */
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: var(--sidebar-w);
-      right: 0;
-      height: var(--topbar-h);
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 1px 8px rgba(14,165,233,0.07);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 900;
-      gap: 16px;
-    }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .topbar-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-dark);
-      letter-spacing: -0.2px;
-    }
-
-    .topbar-toggle {
-      display: none;
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      background: var(--primary-xlight);
-      border: 1px solid var(--primary-light);
-      align-items: center; justify-content: center;
-      cursor: pointer;
-      color: var(--primary-dark);
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    /* user pill */
-    .topbar-user {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      background: var(--primary-xlight);
-      border: 1px solid var(--primary-light);
-      border-radius: 99px;
-      padding: 6px 14px 6px 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-
-    .user-avatar {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    /* ── MAIN CONTENT ── */
-    .content {
-      margin-left: var(--sidebar-w);
-      padding-top: var(--topbar-h);
-      min-height: 100vh;
-    }
-
-    .content-inner {
-      padding: 28px 24px;
-    }
-
-    /* ── CARDS (for child pages) ── */
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(14,165,233,0.07);
-      background: var(--white);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(14,165,233,0.13);
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width: 768px) {
-      .sidebar { left: calc(-1 * var(--sidebar-w)); }
-      .sidebar.show { left: 0; }
-      .topbar { left: 0; padding: 0 16px; }
-      .topbar-toggle { display: flex; }
-      .content { margin-left: 0; }
-      .content-inner { padding: 20px 14px; }
-    }
-
-  </style>
-
+@media (min-width:768px) {
+  .sidebar-desktop { position:fixed; top:var(--nav-h); left:0; width:230px; bottom:0; background:#fff; border-right:1px solid var(--border); padding:20px 12px; overflow-y:auto; z-index:100; display:flex; flex-direction:column; justify-content:space-between; }
+  .sidebar-nav a { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; text-decoration:none; color:var(--text-muted); font-size:14px; font-weight:500; margin-bottom:4px; transition:background 0.15s,color 0.15s; }
+  .sidebar-nav a i { font-size:18px; }
+  .sidebar-nav a:hover { background:var(--primary-light); color:var(--primary); }
+  .sidebar-nav a.active { background:var(--primary); color:#fff; }
+  .sidebar-logout { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; text-decoration:none; color:var(--red); background:#FEF2F2; font-size:14px; font-weight:500; }
+  .content-wrap { margin-left:230px; }
+  body { padding-bottom:0; }
+  .bottom-nav { display:none; }
+}
+</style>
 </head>
 <body>
 
-  <!-- ── OVERLAY ── -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="flash-container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}{% for category, message in messages %}
+<div class="flash-msg {{ category }}">{{ message }}</div>
+{% endfor %}{% endif %}
+{% endwith %}
+</div>
 
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar" id="sidebar">
-
-    <div class="sidebar-header">
-      <a href="/business/dashboard" class="sidebar-brand">
-        <div class="sidebar-brand-icon"><i class="bi bi-building"></i></div>
-        <div class="sidebar-brand-name">
-          Business
-          <span>ElixirDraw Panel</span>
-        </div>
-      </a>
+<div class="topbar">
+  <a href="/business/dashboard" class="topbar-brand">
+    <div class="brand-logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="ElixirDraw"></div>
+    <div>
+      <div class="brand-name">Elixir<span>Draw</span></div>
+      <div class="topbar-subtitle">Supplier Panel</div>
     </div>
+  </a>
+  <div class="topbar-right">
+    <a href="#" class="notif-btn"><i class="bi bi-bell"></i><span class="notif-dot"></span></a>
+    <div class="user-avatar">B</div>
+  </div>
+</div>
 
-    <nav class="sidebar-nav">
+<!-- DESKTOP SIDEBAR — only routes that EXIST in app.py -->
+<div class="sidebar-desktop d-none d-md-flex flex-column">
+  <nav class="sidebar-nav">
+    <a href="/business/dashboard"   class="{% if request.path=='/business/dashboard' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="/business/add_property" class="{% if 'add_property' in request.path %}active{% endif %}"><i class="bi bi-building-add"></i> Add Property</a>
+    <a href="/business/my_properties" class="{% if 'my_properties' in request.path %}active{% endif %}"><i class="bi bi-houses"></i> My Properties</a>
+    <a href="/business/add_material" class="{% if 'add_material' in request.path %}active{% endif %}"><i class="bi bi-layers"></i> Add Material</a>
+    <a href="/services" class="{% if request.path == '/services' %}active{% endif %}"><i class="bi bi-tools"></i> Find Services</a>
+    <a href="/register-service-provider" class="{% if 'service-provider' in request.path %}active{% endif %}"><i class="bi bi-person-badge"></i> Service Provider</a>
+    <a href="/business/offers"      class="{% if 'offers' in request.path %}active{% endif %}"><i class="bi bi-gift"></i> Offers</a>
+    <a href="/business/wallet"      class="{% if 'wallet' in request.path %}active{% endif %}"><i class="bi bi-wallet2"></i> Wallet</a>
+    <a href="/logout"               ><i class="bi bi-box-arrow-right"></i> Logout</a>
+  </nav>
+  <a href="/logout" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;text-decoration:none;color:var(--red);background:#FEF2F2;font-size:14px;font-weight:500;">
+    <i class="bi bi-box-arrow-right"></i> Logout
+  </a>
+</div>
 
-      <div class="sidebar-label">Main</div>
+<div class="content-wrap">
+  <div class="page-content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
 
-      <a href="/business/dashboard"
-         class="sidebar-link {% if request.path == '/business/dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2"></i> Dashboard
-      </a>
+<!-- BOTTOM NAV — only real routes -->
+<nav class="bottom-nav d-md-none">
+  <a href="/business/dashboard"   class="nav-item {% if request.path=='/business/dashboard' %}active{% endif %}"><i class="bi bi-house-fill"></i>Home</a>
+  <a href="/business/add_property" class="nav-item {% if 'add_property' in request.path %}active{% endif %}"><i class="bi bi-building"></i>Property</a>
+  <div class="nav-add-wrap"><a href="/business/add_material" class="nav-add-btn"><i class="bi bi-plus-lg"></i></a></div>
+  <a href="/business/wallet"      class="nav-item {% if 'wallet' in request.path %}active{% endif %}"><i class="bi bi-wallet2"></i>Wallet</a>
+  <a href="/business/offers"      class="nav-item {% if 'offers' in request.path %}active{% endif %}"><i class="bi bi-gift"></i>Offers</a>
+</nav>
 
-      <div class="sidebar-label">Listings</div>
-
-      <a href="/business/add_property"
-         class="sidebar-link {% if request.path == '/business/add_property' %}active{% endif %}">
-        <i class="bi bi-house-door"></i> Add Property
-      </a>
-
-      <a href="/business/add_material"
-         class="sidebar-link {% if request.path == '/business/add_material' %}active{% endif %}">
-        <i class="bi bi-box"></i> Add Material
-      </a>
-
-      <div class="sidebar-label">Account</div>
-
-      <a href="/business/wallet"
-         class="sidebar-link {% if request.path == '/business/wallet' %}active{% endif %}">
-        <i class="bi bi-wallet2"></i> Wallet
-      </a>
-
-      <a href="/business/profile"
-         class="sidebar-link {% if request.path == '/business/profile' %}active{% endif %}">
-        <i class="bi bi-person-circle"></i> Profile
-      </a>
-
-    </nav>
-
-    <div class="sidebar-footer">
-      <a href="/logout" class="sidebar-logout">
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </a>
-    </div>
-
-  </aside>
-
-  <!-- ── TOPBAR ── -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-toggle" onclick="toggleSidebar()">
-        <i class="bi bi-list"></i>
-      </div>
-      <span class="topbar-title">{% block page_title %}Business Dashboard{% endblock %}</span>
-    </div>
-
-    <div class="topbar-user">
-      <div class="user-avatar">
-        {{ business.business_name[:1]|upper if business and business.business_name else 'B' }}
-      </div>
-      {{ business.business_name if business else 'Business' }}
-    </div>
-  </header>
-
-  <!-- ── CONTENT ── -->
-  <main class="content">
-    <div class="content-inner">
-      {% block content %}{% endblock %}
-    </div>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('show');
-      document.getElementById('sidebarOverlay').classList.toggle('show');
-    }
-
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('show');
-      document.getElementById('sidebarOverlay').classList.remove('show');
-    }
-
-    /* auto-highlight active link */
-    (function() {
-      const path = window.location.pathname;
-      document.querySelectorAll('.sidebar-link').forEach(link => {
-        if (link.getAttribute('href') === path) link.classList.add('active');
-      });
-    })();
-  </script>
-
-  {% block scripts %}{% endblock %}
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.flash-msg').forEach(el => {
+    el.style.transition='opacity 0.4s'; el.style.opacity='0';
+    setTimeout(()=>el.remove(),400);
+  });
+},3000);
+</script>
 </body>
 </html>

@@ -1,0 +1,140 @@
+{% extends "business/base.html" %}
+{% block title %}Offers — ElixirDraw Business{% endblock %}
+
+{% block content %}
+<style>
+.offer-card { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:16px; box-shadow:var(--card-shadow); }
+.offer-img { width:100%; height:180px; object-fit:cover; display:block; }
+.offer-img-placeholder { height:180px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); display:flex; align-items:center; justify-content:center; font-size:48px; }
+.offer-body { padding:14px; }
+.offer-title { font-size:15px; font-weight:700; color:var(--text-dark); margin-bottom:4px; }
+.offer-meta { font-size:12px; color:var(--text-muted); margin-bottom:8px; }
+
+.prog-wrap { background:#E5E7EB; border-radius:20px; height:7px; overflow:hidden; margin:8px 0; }
+.prog-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--primary),var(--primary-mid)); }
+
+.cd { display:inline-block; padding:5px 11px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px; }
+.cd-safe { background:#DCFCE7; color:#166534; }
+.cd-warn { background:#FEF9C3; color:#92400E; }
+.cd-hot  { background:#FEE2E2; color:#991B1B; }
+
+.join-count { font-size:12px; color:var(--text-muted); margin-bottom:12px; }
+
+.btn-join { width:100%; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-size:14px; font-weight:700; font-family:var(--font); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s; }
+.btn-join:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,107,60,0.35); }
+.btn-joined { background:#E2E8F0; color:var(--text-muted); cursor:default; }
+.btn-joined:hover { transform:none; box-shadow:none; }
+
+.winner-box { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:10px 12px; margin-top:10px; }
+.winner-title { font-size:12px; font-weight:700; color:var(--primary); margin-bottom:5px; display:flex; align-items:center; gap:5px; }
+.winner-item { font-size:12px; color:var(--text-dark); font-weight:600; margin-bottom:3px; }
+
+.section-label { font-size:14px; font-weight:800; color:var(--text-dark); margin:24px 0 12px; display:flex; align-items:center; gap:7px; }
+
+.empty-state { text-align:center; padding:60px 20px; }
+</style>
+
+<div class="section-label"><i class="bi bi-trophy-fill" style="color:var(--primary);"></i> Active Offers</div>
+
+{% if offers %}
+{% for offer in offers %}
+<div class="offer-card">
+  {% if offer.image %}
+  <img src="{{ url_for('static', filename='uploads/' ~ offer.image) }}" class="offer-img">
+  {% else %}
+  <div class="offer-img-placeholder">🎁</div>
+  {% endif %}
+
+  <div class="offer-body">
+    <div class="offer-title">{{ offer.title }}</div>
+    <div class="offer-meta">
+      <i class="bi bi-calendar3"></i>
+      Expires: {{ offer.expiry.strftime('%d %b %Y') if offer.expiry else '—' }}
+    </div>
+
+    <div class="cd cd-safe" data-expiry="{{ offer.expiry }}">⏳ Loading...</div>
+
+    <div class="join-count">
+      {{ offer.total_enrolled or 0 }} joined · {{ offer.spots_left or 0 }} spots left
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-fill" style="width:{{ offer.progress or 0 }}%"></div>
+    </div>
+
+    {% if offer.id in enrolled %}
+    <button class="btn-join btn-joined" disabled>
+      <i class="bi bi-check-circle-fill"></i> Already Joined
+    </button>
+    {% elif active_enrollment %}
+    <button class="btn-join btn-joined" disabled title="You're already in {{ active_enrollment.title }}">
+      <i class="bi bi-lock-fill"></i> Already in another offer
+    </button>
+    {% elif not plan_active %}
+    <a href="/business/wallet" class="btn-join" style="text-decoration:none;background:linear-gradient(135deg,#F59E0B,#D97706);">
+      <i class="bi bi-lock-fill"></i> Need active plan to join
+    </a>
+    {% else %}
+    <form method="POST" action="/offer/enroll/{{ offer.id }}">
+      <button type="submit" class="btn-join">
+        <i class="bi bi-trophy-fill"></i> Join Offer
+      </button>
+    </form>
+    {% endif %}
+
+    {% if offer.winner1_name or offer.winner2_name or offer.winner3_name %}
+    <div class="winner-box">
+      <div class="winner-title"><i class="bi bi-trophy-fill"></i> Winners</div>
+      {% if offer.winner1_name %}<div class="winner-item">🥇 {{ offer.winner1_name }}</div>{% endif %}
+      {% if offer.winner2_name %}<div class="winner-item">🥈 {{ offer.winner2_name }}</div>{% endif %}
+      {% if offer.winner3_name %}<div class="winner-item">🥉 {{ offer.winner3_name }}</div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="empty-state">
+  <div style="font-size:56px;margin-bottom:16px;">🎁</div>
+  <div style="font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:6px;">No Active Offers</div>
+  <div style="font-size:13px;color:var(--text-muted);">Check back later for exciting rewards.</div>
+</div>
+{% endif %}
+
+{% if history_offers %}
+<div class="section-label"><i class="bi bi-clock-history" style="color:var(--text-muted);"></i> Past Offers (Participated)</div>
+{% for offer in history_offers %}
+<div class="offer-card" style="opacity:0.75;">
+  <div class="offer-body">
+    <div class="offer-title">{{ offer.title }}</div>
+    <div class="offer-meta">Expired: {{ offer.expiry.strftime('%d %b %Y') if offer.expiry else '—' }}</div>
+    {% if offer.winner1_name or offer.winner2_name or offer.winner3_name %}
+    <div class="winner-box">
+      <div class="winner-title"><i class="bi bi-trophy-fill"></i> Winners</div>
+      {% if offer.winner1_name %}<div class="winner-item">🥇 {{ offer.winner1_name }}</div>{% endif %}
+      {% if offer.winner2_name %}<div class="winner-item">🥈 {{ offer.winner2_name }}</div>{% endif %}
+      {% if offer.winner3_name %}<div class="winner-item">🥉 {{ offer.winner3_name }}</div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<script>
+document.querySelectorAll('.cd[data-expiry]').forEach(el => {
+  function tick() {
+    const exp = new Date(el.dataset.expiry);
+    const diff = exp - new Date();
+    if (diff <= 0) { el.textContent = '⏰ Expired'; el.className = 'cd cd-hot'; return; }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    el.textContent = d > 0 ? `⏳ ${d}d ${h}h left` : `⏳ ${h}h ${m}m left`;
+    el.className = 'cd ' + (d > 7 ? 'cd-safe' : d > 2 ? 'cd-warn' : 'cd-hot');
+  }
+  tick(); setInterval(tick, 60000);
+});
+</script>
+{% endblock %}

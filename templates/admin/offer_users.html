@@ -1,0 +1,129 @@
+{% extends "admin/base.html" %}
+{% block page_title %}Enrolled Users{% endblock %}
+
+{% block content %}
+
+<div class="card p-4">
+
+  <h5 class="mb-3">
+    Enrolled Users — ₹{{ offer.amount }} Offer
+  </h5>
+
+  <!-- 🏷️ STATUS BADGE -->
+  {% if offer.status == 'completed' %}
+    <span class="badge bg-success mb-2">✅ Winners Declared</span>
+  {% else %}
+    <span class="badge bg-warning mb-2">⏳ Pending</span>
+  {% endif %}
+
+  <!-- 🔍 SEARCH -->
+  <input type="text" id="searchBox" class="form-control mb-3"
+         placeholder="🔍 Search user by name / email / phone">
+
+  <form method="POST"
+        action="/admin/offers/{{ offer.id }}/declare_manual"
+        {% if offer.status == 'completed' %}onsubmit="return false;"{% endif %}>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle" id="userTable">
+
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+
+            <th>🥇 1st Rank</th>
+            <th>🥈 2nd Rank</th>
+            <th>🥉 3rd Rank</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for user in users %}
+          <tr class="user-row">
+
+            <td>{{ loop.index }}</td>
+            <td class="uname">{{ user.name }}</td>
+            <td class="uemail">{{ user.email }}</td>
+            <td class="uphone">{{ user.phone }}</td>
+
+            <!-- 🥇 1st Rank -->
+            <td>
+              <input type="radio" name="rank1" value="{{ user.id }}"
+                     {% if offer.status == 'completed' %}disabled{% endif %}>
+            </td>
+
+            <!-- 🥈 2nd Rank -->
+            <td>
+              <input type="checkbox" name="rank2" value="{{ user.id }}"
+                     {% if offer.status == 'completed' %}disabled{% endif %}>
+            </td>
+
+            <!-- 🥉 3rd Rank -->
+            <td>
+              <input type="checkbox" name="rank3" value="{{ user.id }}"
+                     {% if offer.status == 'completed' %}disabled{% endif %}>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+          {% if users|length == 0 %}
+          <tr>
+            <td colspan="7" class="text-center text-muted">
+              No users enrolled yet
+            </td>
+          </tr>
+          {% endif %}
+
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- 🔥 BUTTON -->
+    {% if users|length >= 3 %}
+
+      {% if offer.status == 'completed' %}
+        <button class="btn btn-dark mt-3" disabled>
+          ✅ Winners Already Declared
+        </button>
+      {% else %}
+        <button class="btn btn-success mt-3">
+          🎉 Declare Winners
+        </button>
+      {% endif %}
+
+    {% else %}
+      <button class="btn btn-secondary mt-3" disabled>
+        Need minimum 3 users
+      </button>
+    {% endif %}
+
+  </form>
+</div>
+
+<!-- 🔍 SEARCH SCRIPT -->
+<script>
+document.getElementById("searchBox").addEventListener("keyup", function () {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll(".user-row");
+
+    rows.forEach(row => {
+        let name = row.querySelector(".uname").innerText.toLowerCase();
+        let email = row.querySelector(".uemail").innerText.toLowerCase();
+        let phone = row.querySelector(".uphone").innerText.toLowerCase();
+
+        if (name.includes(value) || email.includes(value) || phone.includes(value)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+});
+</script>
+
+{% endblock %}

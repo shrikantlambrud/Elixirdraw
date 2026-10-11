@@ -231,6 +231,31 @@
   .empty-state p  { font-size: 14px; color: #64748b; margin: 0; }
 
   .table-scroll { overflow-x: auto; }
+  .btn-reject {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 10px rgba(239,68,68,0.25);
+  transition: opacity 0.15s, transform 0.12s;
+}
+
+.btn-reject:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.btn-reject:active {
+  transform: scale(0.97);
+}
 
 </style>
 
@@ -338,16 +363,30 @@
               {% endif %}
             </td>
 
-            <td>
-              {% if r.status != 'approved' %}
-              <a href="/admin/approve_wallet/{{ r.id }}" class="btn-approve">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                Approve
-              </a>
-              {% else %}
-              <span class="done-text">Done</span>
-              {% endif %}
-            </td>
+           <td>
+  {% if r.status != 'approved' %}
+    
+    <div style="display:flex; gap:6px;">
+      
+      <!-- Approve -->
+      <a href="/admin/approve_wallet/{{ r.id }}" class="btn-approve">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Approve
+      </a>
+
+      <!-- Reject -->
+      <a href="/admin/reject_wallet/{{ r.id }}" class="btn-reject">
+        ✕ Reject
+      </a>
+
+    </div>
+
+  {% else %}
+    <span class="done-text">Done</span>
+  {% endif %}
+</td>
 
           </tr>
           {% endfor %}

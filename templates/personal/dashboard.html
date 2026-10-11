@@ -1,428 +1,174 @@
 {% extends "personal/base.html" %}
-{% block title %}Available Properties — Personal Panel{% endblock %}
+{% block title %}Home — ElixirDraw{% endblock %}
+
 {% block content %}
-
 <style>
-
-  .page-title {
-    font-size: 22px;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.4px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .page-title-icon {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(14,165,233,0.25);
-    flex-shrink: 0;
-  }
-
-  .page-title-icon svg {
-    width: 20px;
-    height: 20px;
-    stroke: #fff;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ── CARD ── */
-  .property-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #fff;
-    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
-    box-shadow: 0 2px 10px rgba(14,165,233,0.07);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .property-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 28px rgba(14,165,233,0.15);
-    border-color: #bae6fd;
-  }
-
-  /* ── IMAGE ── */
-  .property-img-wrap {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .property-img {
-    height: 200px;
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s;
-  }
-
-  .property-card:hover .property-img {
-    transform: scale(1.04);
-  }
-
-  /* ── BADGE ── */
-  .type-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: #0ea5e9;
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .type-badge svg {
-    width: 12px;
-    height: 12px;
-    stroke: #fff;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ── CARD BODY ── */
-  .card-body {
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
-
-  /* ── META ROW ── */
-  .meta-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #64748b;
-    margin-bottom: 5px;
-  }
-
-  .meta-row svg {
-    width: 14px;
-    height: 14px;
-    stroke: #94a3b8;
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex-shrink: 0;
-  }
-
-  /* ── PRICE ── */
-  .price-text {
-    font-size: 20px;
-    font-weight: 800;
-    color: #0284c7;
-    letter-spacing: -0.4px;
-    margin: 10px 0 6px;
-  }
-
-  .price-text span {
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
-  }
-
-  /* ── DIVIDER ── */
-  .card-divider {
-    border: none;
-    border-top: 1px solid #f1f5f9;
-    margin: 12px 0;
-  }
-
-  /* ── DETAILS ROW ── */
-  .detail-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 12px;
-  }
-
-  .detail-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #0369a1;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 6px;
-    padding: 3px 9px;
-  }
-
-  .detail-chip svg {
-    width: 12px;
-    height: 12px;
-    stroke: #0369a1;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* status badge */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 99px;
-    background: #dcfce7;
-    color: #15803d;
-  }
-
-  .status-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #16a34a;
-    display: inline-block;
-  }
-
-  /* ── BUTTON STACK ── */
-  .btn-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 12px;
-  }
-
-  .btn-contact {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    border: none;
-    transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
-    font-family: inherit;
-  }
-
-  .btn-contact svg {
-    width: 16px;
-    height: 16px;
-    stroke: #fff;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    flex-shrink: 0;
-  }
-
-  .btn-contact:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
-
-  .btn-call      { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; box-shadow: 0 3px 10px rgba(14,165,233,0.25); }
-  .btn-whatsapp  { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; box-shadow: 0 3px 10px rgba(34,197,94,0.25); }
-  .btn-map       { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 3px 10px rgba(249,115,22,0.25); }
-
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 64px 20px;
-  }
-
-  .empty-icon {
-    width: 72px;
-    height: 72px;
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-  }
-
-  .empty-icon svg {
-    width: 36px;
-    height: 36px;
-    stroke: #0ea5e9;
-    fill: none;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .empty-state h5 {
-    font-size: 17px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 8px;
-  }
-
-  .empty-state p {
-    font-size: 14px;
-    color: #64748b;
-    margin: 0;
-  }
-
-  @media (max-width: 768px) {
-    .property-img { height: 170px; }
-  }
-
+/* Horizontal scroll for properties */
+.prop-scroll { display:flex; gap:14px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.prop-scroll::-webkit-scrollbar { display:none; }
+.prop-scroll .prop-card { min-width:200px; flex-shrink:0; }
 </style>
 
-<div class="container mt-4 mb-5">
-
-  <!-- Page Title -->
-  <h3 class="page-title">
-    <div class="page-title-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<!-- Search Bar -->
+<div style="margin-bottom:18px;">
+  <form action="/" method="GET">
+    <div class="search-bar">
+      <i class="bi bi-search"></i>
+      <input type="text" name="search" placeholder="Search properties, services...">
+      <button class="search-filter-btn" type="button"><i class="bi bi-sliders"></i></button>
     </div>
-    Available Properties
-  </h3>
+  </form>
+</div>
 
-  {% if properties %}
+<!-- Top Listing -->
+<div class="sec-header">
+  <span class="sec-title">Top Listing</span>
+  <a href="/personal/properties" class="sec-link">View All <i class="bi bi-chevron-right"></i></a>
+</div>
 
-  <div class="row g-3">
+<div class="prop-scroll mb-4">
+{% if properties %}
+{% for p in properties[:4] %}
+<div class="prop-card">
+  <div class="prop-img-wrap">
+    {% if p.image1 %}
+    <img src="{{ url_for('static', filename='uploads/' + p.image1) }}" class="prop-img">
+    {% else %}
+    <div style="height:160px;background:linear-gradient(135deg,#EEF2FF,#C7D2FE);display:flex;align-items:center;justify-content:center;font-size:36px;">🏠</div>
+    {% endif %}
+    <span class="prop-badge {% if p.listing_type == 'rent' %}rent{% else %}sale{% endif %}">
+      {% if p.listing_type == 'rent' %}FOR RENT{% else %}FOR SALE{% endif %}
+    </span>
+    <div class="prop-heart"><i class="bi bi-heart"></i></div>
+  </div>
+  <div class="prop-body">
+    <div class="prop-title">{{ p.title }}</div>
+    <div class="prop-loc"><i class="bi bi-geo-alt-fill" style="font-size:11px;color:var(--primary);"></i>{{ p.location }}</div>
+    <div class="prop-price">₹{{ p.price }}{% if p.listing_type == 'rent' %} <span style="font-size:12px;font-weight:500;color:var(--text-muted);">/month</span>{% endif %}</div>
+    <div class="prop-type">For {{ p.listing_type|capitalize }}</div>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div style="text-align:center;padding:30px;width:100%;color:var(--text-muted);font-size:14px;">No properties yet</div>
+{% endif %}
+</div>
 
-    {% for p in properties %}
+<!-- Services -->
+<div class="sec-header">
+  <span class="sec-title">Services</span>
+  <a href="/services" class="sec-link">View All <i class="bi bi-chevron-right"></i></a>
+</div>
 
-    <div class="col-lg-4 col-md-6 col-sm-12">
-      <div class="property-card">
+<div class="service-grid mb-4">
+  <a href="/services?category=Construction+Contractor" class="service-item">
+    <div class="service-icon" style="background:#FEF3C7;"><span>👷</span></div>
+    <div class="service-label">Construction Contractor</div>
+  </a>
+  <a href="/services?category=Packers+%26+Movers" class="service-item">
+    <div class="service-icon" style="background:#DBEAFE;"><span>🚛</span></div>
+    <div class="service-label">Packers & Movers</div>
+  </a>
+  <a href="/services?category=Engineer" class="service-item">
+    <div class="service-icon" style="background:#DCFCE7;"><span>👷‍♂️</span></div>
+    <div class="service-label">Engineer</div>
+  </a>
+  <a href="/services?category=Plumber" class="service-item">
+    <div class="service-icon" style="background:#EDE9FE;"><span>🔧</span></div>
+    <div class="service-label">Plumber</div>
+  </a>
+  <a href="/services?category=Electrician" class="service-item">
+    <div class="service-icon" style="background:#FEF9C3;"><span>⚡</span></div>
+    <div class="service-label">Electrician</div>
+  </a>
+  <a href="/services?category=Fabricator" class="service-item">
+    <div class="service-icon" style="background:#F3E8FF;"><span>🧑‍🔧</span></div>
+    <div class="service-label">Fabricator</div>
+  </a>
+  <a href="/services?category=Welder" class="service-item">
+    <div class="service-icon" style="background:#FEE2E2;"><span>🔨</span></div>
+    <div class="service-label">Welder</div>
+  </a>
+  <a href="/services?category=Carpenter" class="service-item">
+    <div class="service-icon" style="background:#FEF3C7;"><span>🪚</span></div>
+    <div class="service-label">Carpenter</div>
+  </a>
+</div>
 
-        <!-- IMAGE -->
-        <div class="property-img-wrap">
-          {% if p.image1 %}
-          <img src="{{ url_for('static', filename='uploads/' + p.image1) }}" class="property-img" alt="{{ p.title }}">
-          {% else %}
-          <img src="https://via.placeholder.com/400x200" class="property-img" alt="Property">
-          {% endif %}
-
-          <!-- BADGE -->
-          <div class="type-badge">
-            {% if p.property_type == 'flat' %}
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 21V9h6v12"/></svg>
-            Flat
-            {% elif p.property_type == 'room' %}
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            Room
-            {% else %}
-            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            Property
-            {% endif %}
-          </div>
-        </div>
-
-        <!-- BODY -->
-        <div class="card-body">
-
-          <h5 class="card-title">{{ p.title }}</h5>
-
-          <div class="meta-row">
-            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            {{ p.city }}{% if p.area %}, {{ p.area }}{% endif %}
-          </div>
-
-          <div class="price-text">
-            ₹{{ p.price }} <span>/ month</span>
-          </div>
-
-          <div class="detail-chips">
-            {% if p.deposit %}
-            <span class="detail-chip">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-              Deposit ₹{{ p.deposit }}
-            </span>
-            {% endif %}
-            <span class="detail-chip">
-              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {{ p.created_at }}
-            </span>
-            <span class="status-badge">{{ p.status }}</span>
-          </div>
-
-          <hr class="card-divider">
-
-          <!-- CONTACT BUTTONS -->
-          <div class="btn-stack">
-
-            <a href="tel:{{ p.user_phone if p.user_phone else '9999999999' }}"
-               class="btn-contact btn-call">
-              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.56 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.49a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Call Now
-            </a>
-
-            <a href="https://wa.me/91{{ p.user_phone if p.user_phone else '9999999999' }}"
-               target="_blank"
-               class="btn-contact btn-whatsapp">
-              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-              WhatsApp
-            </a>
-
-            <a href="{{ p.map_link if p.map_link else 'https://maps.google.com' }}"
-               target="_blank"
-               class="btn-contact btn-map">
-              <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-              View on Map
-            </a>
-
-          </div>
-
-        </div>
-
+<!-- Promo Banner -->
+<a href="/offers" style="text-decoration:none;display:block;margin-bottom:24px;">
+  <div class="promo-banner">
+    <div class="promo-left">
+      <div class="promo-icon">🏆</div>
+      <div class="promo-text">
+        <div class="win">Win</div>
+        <div class="amount">1 CRORE</div>
+        <div class="label">REWARD</div>
       </div>
     </div>
-
-    {% endfor %}
-
-  </div>
-
-  {% else %}
-
-  <div class="empty-state">
-    <div class="empty-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <div class="promo-mid-divider"></div>
+    <div class="promo-left">
+      <div class="promo-text">
+        <div class="win">Win</div>
+        <div class="amount" style="color:#F59E0B;">LAND</div>
+        <div class="label">REWARD</div>
+      </div>
+      <div style="font-size:28px;">📍</div>
     </div>
-    <h5>No Properties Found</h5>
-    <p>There are no available properties at the moment. Check back soon.</p>
+    <button class="promo-btn">Participate Now</button>
   </div>
+</a>
 
-  {% endif %}
-
+<!-- Properties Category -->
+<div class="sec-header">
+  <span class="sec-title">Properties</span>
+  <a href="/personal/properties" class="sec-link">View All <i class="bi bi-chevron-right"></i></a>
 </div>
+
+<div class="prop-category-row mb-4">
+  <a href="/personal/properties?type=sell" class="prop-cat-tile">
+    <div class="cat-icon">🏡</div>
+    <div>
+      <div class="cat-title">Buy Property</div>
+      <div class="cat-sub">Find your dream home</div>
+    </div>
+    <i class="bi bi-chevron-right ms-auto" style="color:var(--primary);font-size:12px;"></i>
+  </a>
+  <a href="/personal/properties?type=rent" class="prop-cat-tile">
+    <div class="cat-icon">🏢</div>
+    <div>
+      <div class="cat-title">Rent Property</div>
+      <div class="cat-sub">Find rental properties</div>
+    </div>
+    <i class="bi bi-chevron-right ms-auto" style="color:var(--primary);font-size:12px;"></i>
+  </a>
+</div>
+
+<!-- Materials quick -->
+<div class="sec-header">
+  <span class="sec-title">🧱 Materials</span>
+  <a href="/personal/materials" class="sec-link">View All <i class="bi bi-chevron-right"></i></a>
+</div>
+
+{% if materials %}
+<div class="prop-scroll mb-2">
+{% for m in materials[:4] %}
+<div style="min-width:160px;flex-shrink:0;">
+  <div class="prop-card">
+    {% if m.image1 %}
+    <img src="{{ url_for('static', filename='uploads/' + m.image1) }}" style="width:100%;height:120px;object-fit:cover;">
+    {% else %}
+    <div style="height:120px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:28px;">🧱</div>
+    {% endif %}
+    <div class="prop-body">
+      <div class="prop-title" style="font-size:13px;">{{ m.title }}</div>
+      <div class="prop-price" style="font-size:14px;">₹{{ m.price }}</div>
+      <div class="prop-type">{{ m.location }}</div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
 
 {% endblock %}
