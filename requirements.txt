@@ -1,3 +1,5 @@
-flask
-mysql-connector-python
-werkzeug
+Flask>=3.0
+Flask-Mail>=0.10
+mysql-connector-python>=8.4
+Werkzeug>=3.0
+gunicorn>=22.0
