@@ -44,16 +44,18 @@ SITE_DOMAIN = "https://www.elixirdraw.com"
 
 def _db_config():
     """DB settings come from environment variables (set them in Render ->
-    Environment). Works with any MySQL host: Aiven, TiDB Cloud, Railway,
-    Hostinger remote MySQL, or a self-hosted MySQL."""
+    Environment). Works with any MySQL host like Aiven with enforced SSL."""
     cfg = dict(
-        host=os.environ.get("DB_HOST", "localhost"),
-        port=int(os.environ.get("DB_PORT", "3306")),
-        user=os.environ.get("DB_USER", "root"),
-        password=os.environ.get("DB_PASSWORD", ""),
-        database=os.environ.get("DB_NAME", "realestate"),
-        connection_timeout=15,
+        host=os.environ.get("DB_HOST", "mysql-32feb24f-elixirdraw26-af24.b.aivencloud.com"),
+        port=int(os.environ.get("DB_PORT", "13179")),
+        user=os.environ.get("DB_USER", "avnadmin"),
+        password=os.environ.get("DB_PASSWORD", "AVNS__aJ7h2qPd_hyF1PlJ3q"), # ⚠️ इथे तुमचा चालू असलेला खरा पासवर्ड टाका
+        database=os.environ.get("DB_NAME", "defaultdb"),
+        connection_timeout=25,
+        ssl={"ssl_mode": "REQUIRED"} # Aiven साठी हे जोडणे अत्यंत अनिवार्य आहे
     )
+    return cfg
+
     ssl_ca = os.environ.get("DB_SSL_CA")          # path to CA file, if provider needs it
     if ssl_ca:
         cfg["ssl_ca"] = ssl_ca
