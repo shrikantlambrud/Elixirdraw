@@ -47,10 +47,10 @@ def _db_config():
     Environment). Works with any MySQL host: Aiven, TiDB Cloud, Railway,
     Hostinger remote MySQL, or a self-hosted MySQL."""
     cfg = dict(
-        host=(os.environ.get("DB_HOST") or "localhost").strip(),
-        port=int(os.environ.get("DB_PORT", "3306")),
-        user=(os.environ.get("DB_USER") or "root").strip(),
-        password=os.environ.get("DB_PASSWORD", ""),
+        host=(os.environ.get("DB_HOST") or "mysql-32feb24f-elixirdraw26-af24.b.aivencloud.com").strip(),
+        port=int(os.environ.get("DB_PORT", "13179")),
+        user=(os.environ.get("DB_USER") or "avnadmin").strip(),
+        password=os.environ.get("DB_PASSWORD", "AVNS__aJ7h2qPd_hyF1PlJ3q"),
         database=(os.environ.get("DB_NAME") or "defaultdb").strip(),
         connection_timeout=15,
     )
