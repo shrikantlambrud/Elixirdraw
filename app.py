@@ -239,6 +239,9 @@ def send_mail(msg):
             )
             urllib.request.urlopen(req, timeout=15).read()
         else:
+            # SMTP fallback: short timeout so a blocked port can't freeze the worker
+            import socket
+            socket.setdefaulttimeout(10)
             mail.send(msg)
         return True
     except Exception as e:
