@@ -56,11 +56,11 @@ def _db_config():
     )
     return cfg
 
-    ssl_ca = os.environ.get("DB_SSL_CA")          # path to CA file, if provider needs it
-    if ssl_ca:
-        cfg["ssl_ca"] = ssl_ca
-    elif os.environ.get("DB_SSL", "").lower() in ("1", "true", "yes"):
-        cfg["ssl_disabled"] = False
+    ssl_ca = os.environ.get("DB_SSL_CA")
+if ssl_ca:
+    cfg["ssl_ca"] = ssl_ca
+elif os.environ.get("DB_SSL", "").lower() in ("1", "true", "yes"):
+    cfg["ssl_disabled"] = False
     return cfg
 
 def get_db():
