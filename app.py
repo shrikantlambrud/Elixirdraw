@@ -44,23 +44,21 @@ SITE_DOMAIN = "https://www.elixirdraw.com"
 
 def _db_config():
     """DB settings come from environment variables (set them in Render ->
-    Environment). Works with any MySQL host like Aiven with enforced SSL."""
+    Environment). Works with any MySQL host: Aiven, TiDB Cloud, Railway,
+    Hostinger remote MySQL, or a self-hosted MySQL."""
     cfg = dict(
-        host=os.environ.get("DB_HOST", "mysql-32feb24f-elixirdraw26-af24.b.aivencloud.com"),
-        port=int(os.environ.get("DB_PORT", "13179")),
-        user=os.environ.get("DB_USER", "avnadmin"),
-        password=os.environ.get("DB_PASSWORD", "AVNS__aJ7h2qPd_hyF1PlJ3q"), # ⚠️ इथे तुमचा चालू असलेला खरा पासवर्ड टाका
-        database=os.environ.get("DB_NAME", "defaultdb"),
-        connection_timeout=25,
-        ssl={"ssl_mode": "REQUIRED"} # Aiven साठी हे जोडणे अत्यंत अनिवार्य आहे
+        host=(os.environ.get("DB_HOST") or "localhost").strip(),
+        port=int(os.environ.get("DB_PORT", "3306")),
+        user=(os.environ.get("DB_USER") or "root").strip(),
+        password=os.environ.get("DB_PASSWORD", ""),
+        database=(os.environ.get("DB_NAME") or "defaultdb").strip(),
+        connection_timeout=15,
     )
-    return cfg
-
-    ssl_ca = os.environ.get("DB_SSL_CA")
-if ssl_ca:
-    cfg["ssl_ca"] = ssl_ca
-elif os.environ.get("DB_SSL", "").lower() in ("1", "true", "yes"):
-    cfg["ssl_disabled"] = False
+    ssl_ca = os.environ.get("DB_SSL_CA")          # path to CA file, if provider needs it
+    if ssl_ca:
+        cfg["ssl_ca"] = ssl_ca
+    elif os.environ.get("DB_SSL", "").lower() in ("1", "true", "yes"):
+        cfg["ssl_disabled"] = False
     return cfg
 
 def get_db():
@@ -190,7 +188,10 @@ def run_migrations():
     db.close()
     print("MIGRATIONS DONE")
 
-run_migrations()
+try:
+    run_migrations()
+except Exception as _e:
+    print("MIGRATION FAILED (app will still start):", _e)
 
 # ---------------- MAIL CONFIG ----------------
 
