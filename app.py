@@ -203,6 +203,55 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'elixirdraw26@gmail.com')
 mail = Mail(app)
 
+
+# ==============================
+# 📩 EMAIL SENDING (works on Render)
+# ==============================
+# Render blocks SMTP ports (25/465/587) on free web services, so Gmail SMTP
+# fails and register / OTP crashes with Internal Server Error.
+# If BREVO_API_KEY is set, emails go out over HTTPS (port 443), which is
+# never blocked. Otherwise we fall back to Gmail SMTP. Either way a failure
+# no longer crashes the page - the user just sees a message.
+def send_mail(msg):
+    import json
+    import urllib.request
+
+    api_key = os.environ.get("BREVO_API_KEY", "").strip()
+    sender_email = os.environ.get("MAIL_FROM") or app.config['MAIL_USERNAME']
+
+    try:
+        if api_key:
+            payload = {
+                "sender": {"name": "ElixirDraw", "email": sender_email},
+                "to": [{"email": r} for r in msg.recipients],
+                "subject": msg.subject,
+                "textContent": msg.body,
+            }
+            req = urllib.request.Request(
+                "https://api.brevo.com/v3/smtp/email",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "api-key": api_key,
+                    "content-type": "application/json",
+                    "accept": "application/json",
+                },
+                method="POST",
+            )
+            urllib.request.urlopen(req, timeout=15).read()
+        else:
+            mail.send(msg)
+        return True
+    except Exception as e:
+        print("EMAIL SEND FAILED:", repr(e))
+        try:
+            body = e.read().decode() if hasattr(e, "read") else ""
+            if body:
+                print("EMAIL ERROR BODY:", body)
+        except Exception:
+            pass
+        flash("Could not send the email right now. Please try again later.", "danger")
+        return False
+
 # # DATABASE CONNECTION
 # def get_db():
 #     return mysql.connector.connect(
@@ -313,7 +362,7 @@ Support Team
 ElixirDraw
 """
 
-        mail.send(msg)
+        send_mail(msg)
 
         flash("OTP sent successfully!", "success")
         return redirect(url_for("verify_otp"))
@@ -453,7 +502,7 @@ Best regards,
 Support Team
 """
 
-        mail.send(msg)
+        send_mail(msg)
 
         return redirect("/verify-business-otp")
 
@@ -590,7 +639,7 @@ For security reasons, never share this OTP with anyone.
 Thank you,  
 Support Team
 """
-        mail.send(msg)
+        send_mail(msg)
 
         return redirect("/verify-reset-otp")
 
@@ -2739,7 +2788,7 @@ Your OTP for profile update is:
 Valid for 5 minutes.
 """
 
-            mail.send(msg)
+            send_mail(msg)
 
             return redirect("/verify-email-otp")
 
