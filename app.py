@@ -48,7 +48,7 @@ def _db_config():
     Hostinger remote MySQL, or a self-hosted MySQL."""
     cfg = dict(
         host=(os.environ.get("DB_HOST") or "mysql-32feb24f-elixirdraw26-af24.b.aivencloud.com").strip(),
-        port=int(os.environ.get("DB_PORT", "13179")),
+        port=int(os.environ.get("DB_PORT") or "13179"),
         user=(os.environ.get("DB_USER") or "avnadmin").strip(),
         password=os.environ.get("DB_PASSWORD", "AVNS__aJ7h2qPd_hyF1PlJ3q"),
         database=(os.environ.get("DB_NAME") or "defaultdb").strip(),
@@ -57,8 +57,8 @@ def _db_config():
     ssl_ca = os.environ.get("DB_SSL_CA")          # path to CA file, if provider needs it
     if ssl_ca:
         cfg["ssl_ca"] = ssl_ca
-    elif os.environ.get("DB_SSL", "").lower() in ("1", "true", "yes"):
-        cfg["ssl_disabled"] = False
+    elif os.environ.get("DB_SSL", "true").lower() in ("1", "true", "yes"):
+        cfg["ssl_disabled"] = False   # Aiven requires SSL (default ON)
     return cfg
 
 def get_db():
@@ -238,6 +238,7 @@ def send_mail(msg):
                 method="POST",
             )
             reply = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", "ignore")
+            print("EMAIL via Apps Script to", msg.recipients, "-> reply:", reply[:120].replace("\n", " "))
             if reply.strip() != "ok":
                 raise RuntimeError("Apps Script replied: " + reply[:200])
         elif api_key:
@@ -291,6 +292,28 @@ def send_mail(msg):
 # app.config['MAIL_USERNAME'] = 'elixirdraw@gmail.com'
 # app.config['MAIL_DEFAULT_SENDER'] = 'elixirdraw@gmail.com'
 # mail = Mail(app)
+
+@app.route("/test-mail")
+def test_mail():
+    """Open /test-mail?key=<GAS_MAIL_SECRET>&to=you@gmail.com to test email.
+    Shows the exact result in the browser (no need to read logs)."""
+    import traceback
+    from flask_mail import Message
+    secret = (os.environ.get("GAS_MAIL_SECRET") or os.environ.get("BREVO_API_KEY") or "").strip()
+    if not secret or request.args.get("key", "") != secret:
+        return "Not found", 404
+    to = request.args.get("to", "").strip()
+    if not to:
+        return "Add &to=youremail@gmail.com to the URL", 400
+    using = ("Google Apps Script" if os.environ.get("GAS_MAIL_URL")
+             else "Brevo" if os.environ.get("BREVO_API_KEY") else "Gmail SMTP")
+    try:
+        ok = send_mail(Message("ElixirDraw test email", recipients=[to],
+                               body="If you can read this, email sending works."))
+        return f"Method: {using}<br>Result: {'SENT - check inbox and spam' if ok else 'FAILED - see Render logs'}"
+    except Exception:
+        return "<pre>Method: %s\n%s</pre>" % (using, traceback.format_exc())
+
 
 @app.route("/", methods=["GET"])
 def index():
