@@ -199,7 +199,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'elixirdraw26@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'fmvo obbd zpdi ffha')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'elixirdraw26@gmail.com')
 mail = Mail(app)
 
@@ -219,8 +219,28 @@ def send_mail(msg):
     api_key = os.environ.get("BREVO_API_KEY", "").strip()
     sender_email = os.environ.get("MAIL_FROM") or app.config['MAIL_USERNAME']
 
+    gas_url = os.environ.get("GAS_MAIL_URL", "").strip()
+    gas_secret = os.environ.get("GAS_MAIL_SECRET", "").strip()
+
     try:
-        if api_key:
+        if gas_url:
+            # Free option: Google Apps Script web app sends via your Gmail (HTTPS)
+            payload = {
+                "secret": gas_secret,
+                "to": ",".join(msg.recipients),
+                "subject": msg.subject,
+                "body": msg.body,
+            }
+            req = urllib.request.Request(
+                gas_url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"content-type": "application/json"},
+                method="POST",
+            )
+            reply = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", "ignore")
+            if reply.strip() != "ok":
+                raise RuntimeError("Apps Script replied: " + reply[:200])
+        elif api_key:
             payload = {
                 "sender": {"name": "ElixirDraw", "email": sender_email},
                 "to": [{"email": r} for r in msg.recipients],
