@@ -199,7 +199,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'elixirdraw26@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'dohc bvyq ljvt lgzt')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'elixirdraw26@gmail.com')
 mail = Mail(app)
 
@@ -335,6 +335,104 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
+
+# ==============================
+# 🖼️ PERSISTENT IMAGE STORAGE
+# ==============================
+# Render's free disk is wiped on every restart / redeploy, so uploaded photos
+# disappeared ("images don't load"). Every file saved into static/uploads is
+# now ALSO stored in the MySQL database, and /static/uploads/<name> is served
+# from disk if present, otherwise from the database. No template changes needed.
+from werkzeug.datastructures import FileStorage as _FileStorage
+
+_files_table_ready = False
+
+def _ensure_files_table():
+    global _files_table_ready
+    if _files_table_ready:
+        return
+    conn = mysql.connector.connect(**_db_config())
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS uploaded_files (
+            filename VARCHAR(255) NOT NULL PRIMARY KEY,
+            mimetype VARCHAR(100),
+            data LONGBLOB NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+    _files_table_ready = True
+
+
+def _store_file(name, data, mimetype=None):
+    _ensure_files_table()
+    conn = mysql.connector.connect(**_db_config())
+    cur = conn.cursor()
+    cur.execute(
+        "REPLACE INTO uploaded_files (filename, mimetype, data) VALUES (%s, %s, %s)",
+        (name, mimetype, data),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def _load_file(name):
+    _ensure_files_table()
+    conn = mysql.connector.connect(**_db_config())
+    cur = conn.cursor()
+    cur.execute("SELECT mimetype, data FROM uploaded_files WHERE filename = %s", (name,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row  # (mimetype, bytes) or None
+
+
+_orig_filestorage_save = _FileStorage.save
+
+def _save_and_store(self, dst, buffer_size=16384):
+    result = _orig_filestorage_save(self, dst, buffer_size)
+    try:
+        if isinstance(dst, (str, os.PathLike)):
+            path = os.fspath(dst).replace("\\", "/")
+            if "static/uploads/" in path and os.path.isfile(path):
+                with open(path, "rb") as fh:
+                    data = fh.read()
+                if len(data) <= 15 * 1024 * 1024:
+                    import mimetypes as _mt
+                    _store_file(os.path.basename(path), data,
+                                _mt.guess_type(path)[0] or "application/octet-stream")
+    except Exception as e:
+        print("STORE FILE IN DB FAILED:", repr(e))
+    return result
+
+_FileStorage.save = _save_and_store
+
+
+@app.route("/static/uploads/<path:filename>")
+def serve_upload(filename):
+    import io
+    import mimetypes as _mt
+    from flask import send_from_directory, send_file
+    folder = os.path.join(app.root_path, UPLOAD_FOLDER)
+    full = os.path.join(folder, filename)
+    if os.path.isfile(full):
+        return send_from_directory(folder, filename, max_age=86400)
+    try:
+        row = _load_file(os.path.basename(filename))
+    except Exception as e:
+        print("LOAD FILE FROM DB FAILED:", repr(e))
+        row = None
+    if not row:
+        return "Not found", 404
+    mimetype, data = row
+    return send_file(io.BytesIO(data),
+                     mimetype=mimetype or _mt.guess_type(filename)[0] or "application/octet-stream",
+                     max_age=86400)
 # ==============================
 # 🔹 REGISTER ROUTE
 # ==============================
